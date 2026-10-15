@@ -1,0 +1,10 @@
+name = "empirica"
+version = "0.1.0"
+defaultTargets = ["empirica"]
+
+[[lean_lib]]
+name = "Empirica"
+
+[[lean_exe]]
+name = "empirica"
+root = "Main"
