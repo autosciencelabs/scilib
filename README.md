@@ -18,6 +18,7 @@ See examples:
 # Usage
 
 ```
+lake update
 lake build
 lake exe scilib # This runs Main.lean
 lake exe mermaid # This runs Mermaid.lean and generates mermaid diagrams in the viz folder
