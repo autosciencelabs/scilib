@@ -4,3 +4,4 @@ import Scilib.Basic
 import Scilib.ShapeOfEarth
 import Scilib.Semiconductor
 import Scilib.Heliocentrism
+import Scilib.HeatCapacityOfSolids
