@@ -19,6 +19,7 @@ import Scilib.GevDiphotonExcess
 import Scilib.PenziasWilsonHolmdel
 import Scilib.JohnSnowAnd
 import Scilib.ThalidomideAcrossSpecies
+import Scilib.TheEtherAnd
 
 open Scilib
 
@@ -150,6 +151,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "John Snow and cholera, London 1854" Scilib.JohnSnowAnd.evidenceGraph)
   IO.FS.writeFile "viz/thalidomide.md"
     (toMarkdown "Thalidomide across species" Scilib.ThalidomideAcrossSpecies.evidenceGraph)
+  IO.FS.writeFile "viz/ether-michelson-morley.md"
+    (toMarkdown "The ether and the speed of light (1810-1938)" Scilib.TheEtherAnd.evidenceGraph)
   
 
 end Mermaid
