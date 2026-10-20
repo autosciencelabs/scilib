@@ -17,3 +17,4 @@ import Scilib.MendeleevSPeriodic
 import Scilib.MeselsonStahl
 import Scilib.OperaFasterThan
 import Scilib.BaadeSTwo
+import Scilib.LkMaterialsRivals

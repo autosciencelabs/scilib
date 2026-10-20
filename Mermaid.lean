@@ -14,6 +14,7 @@ import Scilib.MendeleevSPeriodic
 import Scilib.MeselsonStahl
 import Scilib.OperaFasterThan
 import Scilib.BaadeSTwo
+import Scilib.LkMaterialsRivals
 
 open Scilib
 
@@ -135,6 +136,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "OPERA faster-than-light neutrinos (2011-12)" Scilib.OperaFasterThan.evidenceGraph)
   IO.FS.writeFile "viz/baade-cepheids.md"
     (toMarkdown "Baade's two Cepheid populations (1952)" Scilib.BaadeSTwo.evidenceGraph)
+  IO.FS.writeFile "viz/lk-99.md"
+    (toMarkdown "LK-99 (2023)" Scilib.LkMaterialsRivals.evidenceGraph)
   
 
 end Mermaid
