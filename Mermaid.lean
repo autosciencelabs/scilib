@@ -111,8 +111,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Colours in soap films" Scilib.SoapFilm.evidenceGraph)
   IO.FS.writeFile "viz/magnus-effect.md"
     (toMarkdown "Magnus effect" Scilib.Magnus.evidenceGraph)
-  IO.FS.writeFile "viz/superconductors.md"
-    (toMarkdown "Superconductors" Scilib.Superconductors.evidenceGraph)
+  IO.FS.writeFile "viz/superconductivity.md"
+    (toMarkdown "Superconductivity" Scilib.Superconductivity.evidenceGraph)
   IO.FS.writeFile "viz/rainbow.md"
     (toMarkdown "Rainbow" Scilib.Rainbow.evidenceGraph)
   IO.FS.writeFile "viz/bernoulli.md"
