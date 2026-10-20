@@ -8,6 +8,8 @@ import Scilib.Superconductors
 import Scilib.Rainbow
 import Scilib.Bernoulli
 import Scilib.Leidenfrost
+import Scilib.Diffraction
+import Scilib.Bragg
 
 open Scilib
 
@@ -117,6 +119,10 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Bernoulli's Principle" Scilib.Bernoulli.evidenceGraph)
   IO.FS.writeFile "viz/leidenfrost.md"
     (toMarkdown "Leidenfrost effect" Scilib.Leidenfrost.evidenceGraph)
+  IO.FS.writeFile "viz/diffraction.md" 
+    (toMarkdown "Light Diffraction" Scilib.Diffraction.evidenceGraph)
+  IO.FS.writeFile "viz/bragg.md" 
+    (toMarkdown "Bragg's Law & X-Ray Crystallography" Scilib.Bragg.evidenceGraph)
   
 
 end Mermaid
