@@ -13,3 +13,13 @@ import Scilib.Bernoulli
 import Scilib.Leidenfrost
 import Scilib.Diffraction
 import Scilib.Bragg
+import Scilib.MendeleevSPeriodic
+import Scilib.MeselsonStahl
+import Scilib.OperaFasterThan
+import Scilib.BaadeSTwo
+import Scilib.LkMaterialsRivals
+import Scilib.GevDiphotonExcess
+import Scilib.PenziasWilsonHolmdel
+import Scilib.JohnSnowAnd
+import Scilib.ThalidomideAcrossSpecies
+import Scilib.TheEtherAnd
