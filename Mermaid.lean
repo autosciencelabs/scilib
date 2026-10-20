@@ -5,6 +5,7 @@ import Scilib.HeatCapacityOfSolids
 import Scilib.SoapFilm
 import Scilib.Magnus
 import Scilib.Superconductors
+import Scilib.Rainbow
 
 open Scilib
 
@@ -108,6 +109,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Magnus effect" Scilib.Magnus.evidenceGraph)
   IO.FS.writeFile "viz/superconductors.md"
     (toMarkdown "Superconductors" Scilib.Superconductors.evidenceGraph)
+  IO.FS.writeFile "viz/rainbow.md"
+    (toMarkdown "Rainbow" Scilib.Rainbow.evidenceGraph)
 
 end Mermaid
 
