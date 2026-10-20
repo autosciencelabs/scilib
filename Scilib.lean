@@ -18,3 +18,4 @@ import Scilib.MeselsonStahl
 import Scilib.OperaFasterThan
 import Scilib.BaadeSTwo
 import Scilib.LkMaterialsRivals
+import Scilib.GevDiphotonExcess

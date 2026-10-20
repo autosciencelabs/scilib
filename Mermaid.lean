@@ -15,6 +15,7 @@ import Scilib.MeselsonStahl
 import Scilib.OperaFasterThan
 import Scilib.BaadeSTwo
 import Scilib.LkMaterialsRivals
+import Scilib.GevDiphotonExcess
 
 open Scilib
 
@@ -138,6 +139,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Baade's two Cepheid populations (1952)" Scilib.BaadeSTwo.evidenceGraph)
   IO.FS.writeFile "viz/lk-99.md"
     (toMarkdown "LK-99 (2023)" Scilib.LkMaterialsRivals.evidenceGraph)
+  IO.FS.writeFile "viz/750-gev-excess.md"
+    (toMarkdown "750 GeV diphoton excess (2015-16)" Scilib.GevDiphotonExcess.evidenceGraph)
   
 
 end Mermaid
