@@ -11,7 +11,7 @@ sphere; Descartes computed the 42° and 51° bows; Newton (1672) explained the c
 dispersion; Young (1803) explained the faint inner bands by interference; Airy (1838)
 gave the wave theory of the bow; Nussenzveig (1977) gave the modern account.
 
-Layers (same pattern as `Heliocentrism.lean`):
+Layers :
 experiments -> readings -> laws (via auxiliaries) -> predictions -> corroboration -> verdict.
 Two rivals, `simpleMirrorModel` and `pureRayOptics`, are refuted by the data.
 -/
