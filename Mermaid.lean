@@ -11,6 +11,7 @@ import Scilib.Leidenfrost
 import Scilib.Diffraction
 import Scilib.Bragg
 import Scilib.MendeleevSPeriodic
+import Scilib.MeselsonStahl
 
 open Scilib
 
@@ -126,6 +127,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Bragg's Law & X-Ray Crystallography" Scilib.Bragg.evidenceGraph)
   IO.FS.writeFile "viz/mendeleev-periodic-law.md"
     (toMarkdown "Mendeleev's periodic law (1869-86)" Scilib.MendeleevSPeriodic.evidenceGraph)
+  IO.FS.writeFile "viz/meselson-stahl.md"
+    (toMarkdown "Meselson-Stahl (1958)" Scilib.MeselsonStahl.evidenceGraph)
   
 
 end Mermaid
