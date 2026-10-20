@@ -8,3 +8,5 @@ import Scilib.HeatCapacityOfSolids
 import Scilib.Rainbow
 import Scilib.SoapFilm
 import Scilib.Magnus
+import Scilib.Superconductors
+import Scilib.Bernoulli
