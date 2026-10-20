@@ -5,3 +5,4 @@ import Scilib.ShapeOfEarth
 import Scilib.Semiconductor
 import Scilib.Heliocentrism
 import Scilib.HeatCapacityOfSolids
+import Scilib.SoapFilm
