@@ -2,6 +2,7 @@ import Scilib.ShapeOfEarth
 import Scilib.Heliocentrism
 import Scilib.Semiconductor
 import Scilib.HeatCapacityOfSolids
+import Scilib.SoapFilm
 import Scilib.Magnus
 import Scilib.Superconductors
 
@@ -101,6 +102,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Semiconductor" Scilib.Semiconductor.evidenceGraph)
   IO.FS.writeFile "viz/heat-capacity.md"
     (toMarkdown "Heat capacity of solids" Scilib.HeatCapacity.evidenceGraph)
+  IO.FS.writeFile "viz/soap-film.md"
+    (toMarkdown "Colours in soap films" Scilib.SoapFilm.evidenceGraph)
   IO.FS.writeFile "viz/magnus-effect.md"
     (toMarkdown "Magnus effect" Scilib.Magnus.evidenceGraph)
   IO.FS.writeFile "viz/superconductors.md"
