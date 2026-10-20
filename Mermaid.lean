@@ -3,6 +3,7 @@ import Scilib.Heliocentrism
 import Scilib.Semiconductor
 import Scilib.HeatCapacityOfSolids
 import Scilib.SoapFilm
+import Scilib.Superconductors
 
 open Scilib
 
@@ -102,6 +103,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Heat capacity of solids" Scilib.HeatCapacity.evidenceGraph)
   IO.FS.writeFile "viz/soap-film.md"
     (toMarkdown "Colours in soap films" Scilib.SoapFilm.evidenceGraph)
+  IO.FS.writeFile "viz/superconductors.md"
+    (toMarkdown "Superconductors" Scilib.Superconductors.evidenceGraph)
 
 end Mermaid
 
