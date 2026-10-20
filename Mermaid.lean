@@ -18,6 +18,7 @@ import Scilib.LkMaterialsRivals
 import Scilib.GevDiphotonExcess
 import Scilib.PenziasWilsonHolmdel
 import Scilib.JohnSnowAnd
+import Scilib.ThalidomideAcrossSpecies
 
 open Scilib
 
@@ -147,6 +148,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Penzias-Wilson, Holmdel horn antenna (1964-65)" Scilib.PenziasWilsonHolmdel.evidenceGraph)
   IO.FS.writeFile "viz/john-snow-cholera.md"
     (toMarkdown "John Snow and cholera, London 1854" Scilib.JohnSnowAnd.evidenceGraph)
+  IO.FS.writeFile "viz/thalidomide.md"
+    (toMarkdown "Thalidomide across species" Scilib.ThalidomideAcrossSpecies.evidenceGraph)
   
 
 end Mermaid
