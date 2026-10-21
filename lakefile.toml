@@ -8,3 +8,7 @@ name = "Scilib"
 [[lean_exe]]
 name = "scilib"
 root = "Main"
+
+[[lean_exe]]
+name = "mermaid"
+root = "Mermaid"
