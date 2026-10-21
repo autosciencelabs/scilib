@@ -12,3 +12,8 @@ root = "Main"
 [[lean_exe]]
 name = "mermaid"
 root = "Mermaid"
+
+[[require]]
+name = "Physlib"
+git = "https://github.com/leanprover-community/physlib.git"
+rev = "v4.35.0"
