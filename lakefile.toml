@@ -1,10 +1,10 @@
-name = "empirica"
+name = "scilib"
 version = "0.1.0"
-defaultTargets = ["empirica"]
+defaultTargets = ["scilib"]
 
 [[lean_lib]]
-name = "Empirica"
+name = "Scilib"
 
 [[lean_exe]]
-name = "empirica"
+name = "scilib"
 root = "Main"

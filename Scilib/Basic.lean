@@ -1,7 +1,7 @@
 import Lean
 
 /-!
-# Empirica: a semi-formal graph of theories and experiments to verify scientific reasoning
+# Scilib: a semi-formal graph of theories and experiments to verify scientific reasoning
 
 Two node types and two relations.
 
@@ -32,7 +32,7 @@ description, and edges mention the values directly.  Node identity is
 structural equality.
 -/
 
-namespace Empirica
+namespace Scilib
 
 /-- A statement about the world, possibly pointing at formal declarations. -/
 structure Theory where
@@ -167,4 +167,4 @@ def missingRefs (g : Graph) : Lean.CoreM (List Lean.Name) := do
   return g.allRefs.eraseDups.filter fun n => !env.contains n
 
 end Graph
-end Empirica
+end Scilib
