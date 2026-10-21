@@ -4,84 +4,101 @@ namespace Scilib.Astrophysics
 
 /-! ## Theories & Paradigms -/
 
-def standardBaryonicNewtonianDynamics : Theory where
-  statement := "Standard Newtonian dynamics and GR with mass provided solely by visible baryonic matter (stars and gas)."
-  sources := ["Classical Mechanics; General Relativity"]
-
-def coldDarkMatterHypothesis : Theory where
-  statement := "Galaxies and clusters are embedded in massive halos of non-baryonic, non-luminous, weakly interacting cold dark matter."
-  sources := ["Vera Rubin 1970s; ΛCDM Standard Model"]
-
-def modifiedNewtonianDynamics : Theory where
-  statement := "MOND: Newton's law of inertia/gravity is modified at accelerations below a0 ≈ 1.2 × 10^-10 m/s^2 without requiring dark matter particles."
+def modifiedNewtonianDynamicsTheory : Theory where
+  statement := "Newtonian gravity breaks down at extremely low accelerations ($a < a_0$), requiring a geometric modification of inertia or gravity rather than unseen mass."
   sources := ["Mordehai Milgrom, 1983"]
+
+def coldDarkMatterCosmologyTheory : Theory where
+  statement := "General Relativity remains universally valid on all scales, but galaxies and clusters are embedded in vast halos of non-baryonic, collisionless elementary particles (Cold Dark Matter)."
+  sources := ["Standard $\\Lambda$CDM Paradigm; Peebles, Blumenthal et al., 1984"]
 
 
 /-! ## Experimental Probes & Regimes -/
 
-def galacticRotationProbe : Theory where
-  statement := "Spectroscopic and 21cm radio observations of spiral galaxy rotation curves at large radii."
+def stellarKinematicsProbe : Theory where
+  statement := "Optical and radio spectroscopic measurement of outer galactic rotation curves using 21cm hydrogen lines and stellar velocities."
+  sources := ["Vera Rubin & W. Kent Ford, 1970"]
 
-def clusterCollisionLensingProbe : Theory where
-  statement := "X-ray gas imaging combined with gravitational lensing maps of colliding galaxy clusters."
+def collidingClusterProbe : Theory where
+  statement := "X-ray gas imaging combined with gravitational lensing mass mapping of merging galaxy clusters."
+  sources := ["Bullet Cluster Multi-Wavelength Survey, 2006"]
+
+def cmbAnisotropyProbe : Theory where
+  statement := "High-precision satellite mapping of temperature and polarization fluctuations in the Cosmic Microwave Background."
+  sources := ["WMAP & Planck Collaborations"]
 
 
 /-! ## Predictions & Derived Claims -/
 
-def KeplerianKeplerianFallbackPrediction : Theory :=
-  { statement := "Orbital velocities of outer gas and stars fall off as v ~ 1/√r beyond the visible baryonic disk." }
+def keplerianFalloffPrediction : Theory :=
+  { statement := "Outer stellar rotation velocities must drop Keplerian-style ($v \\propto 1/\\sqrt{r}$) corresponding strictly to visible luminous mass distributions." }
 
-def flatRotationCurvePrediction : Theory :=
-  { statement := "Orbital velocities of outer gas and stars remain constant (flat rotation curves) at large radii." }
+def asymptoticFlatRotationPrediction : Theory :=
+  { statement := "Rotation curves must flatten asymptotically at large radii, tied directly to acceleration scales or enclosed invisible mass halos." }
 
-def baryonicLensingCoincidencePrediction : Theory :=
-  { statement := "Gravitational lensing mass peaks must strictly coincide with the visible baryonic gas peaks in colliding clusters." }
+def gasLensMassSeparationPrediction : Theory :=
+  { statement := "Collisional baryonic gas experiences ram pressure drag and separates from collisionless mass components during cluster mergers." }
 
-def separatedLensingMassPeakPrediction : Theory :=
-  { statement := "Gravitational lensing mass peaks pass freely through collisions, separating cleanly from the decelerated X-ray baryonic gas." }
+def modifiedInertiaClusterFailurePrediction : Theory :=
+  { statement := "Non-linear modifications of gravity should track the visible gas distribution directly during cluster collisions, failing to separate lensing mass from X-ray gas without dark matter." }
+
+def cmbAcousticPeakRatioPrediction : Theory :=
+  { statement := "Relative heights of CMB acoustic peaks require a specific ratio of cold dark matter to baryonic matter (~5:1) to shape gravitational potential wells." }
 
 
 /-! ## Raw Experiments -/
 
-def rubin1970RotationCurves : Experiment where
-  protocol := "Measure rotational velocities of HI gas and stars in spiral galaxies out to large galactocentric radii."
-  observation := "Rotation curves remain flat at large radii, contradicting the Keplerian drop-off predicted by visible baryonic mass alone."
-  sources := ["Vera Rubin, Kent Ford, Albert Bosma (1970-1980)"]
+def galacticRotationCurves1970 : Experiment where
+  protocol := "Measure 21cm emission lines across spiral galaxies to map outer orbital velocities."
+  observation := "Outer rotation curves remain flat instead of declining Keplerian-style, indicating massive gravitating discrepancies."
+  sources := ["Vera Rubin & W. Kent Ford, 1970"]
 
 def bulletCluster2006 : Experiment where
-  protocol := "Map mass distribution in colliding cluster 1E 0657-558 using Chandra X-ray gas imaging and weak/strong gravitational lensing."
-  observation := "Lensing mass peaks are spatially offset from the baryonic X-ray gas, proving the majority of mass is collisionless."
-  sources := ["Clowe et al., 2006"]
+  protocol := "Analyze gravitational lensing mass maps and X-ray gas emission of colliding galaxy cluster 1E 0657-558."
+  observation := "The majority of the gravitating mass (mapped via lensing) is spatially offset from the colliding X-ray emitting gas clouds, proving the existence of collisionless dark matter."
+  sources := ["Douglas Clowe et al., 2006"]
+
+def planckCmbAnisotropies : Experiment where
+  protocol := "Measure precision power spectrum of temperature fluctuations across the cosmic microwave sky."
+  observation := "CMB acoustic peak amplitudes require precise non-baryonic cold dark matter density parameters ($\\Omega_c h^2 \\approx 0.12$)."
+  sources := ["Planck Collaboration, 2018"]
 
 
-/-! ## The Evidence Graph -/
+/-! ## The Rigorous Evidence Graph -/
 
 def evidenceGraph : Graph where
   edges := [
-    Edge.implies standardBaryonicNewtonianDynamics KeplerianKeplerianFallbackPrediction,
-    Edge.implies standardBaryonicNewtonianDynamics baryonicLensingCoincidencePrediction,
+    -- MOND Predictions & Contradictions
+    Edge.implies modifiedNewtonianDynamicsTheory asymptoticFlatRotationPrediction,
+    Edge.implies modifiedNewtonianDynamicsTheory modifiedInertiaClusterFailurePrediction,
+    Edge.contradicts modifiedInertiaClusterFailurePrediction gasLensMassSeparationPrediction,
 
-    Edge.contradicts KeplerianKeplerianFallbackPrediction flatRotationCurvePrediction,
-    Edge.contradicts baryonicLensingCoincidencePrediction separatedLensingMassPeakPrediction,
+    -- Cold Dark Matter Predictions
+    Edge.implies coldDarkMatterCosmologyTheory asymptoticFlatRotationPrediction,
+    Edge.implies coldDarkMatterCosmologyTheory gasLensMassSeparationPrediction,
+    Edge.implies coldDarkMatterCosmologyTheory cmbAcousticPeakRatioPrediction,
 
-    Edge.implies coldDarkMatterHypothesis flatRotationCurvePrediction,
-    Edge.implies coldDarkMatterHypothesis separatedLensingMassPeakPrediction,
+    -- Probe Entailments
+    Edge.entails [asymptoticFlatRotationPrediction, stellarKinematicsProbe] asymptoticFlatRotationPrediction,
+    Edge.entails [gasLensMassSeparationPrediction, collidingClusterProbe] gasLensMassSeparationPrediction,
+    Edge.entails [cmbAcousticPeakRatioPrediction, cmbAnisotropyProbe] cmbAcousticPeakRatioPrediction,
 
-    Edge.implies modifiedNewtonianDynamics flatRotationCurvePrediction,
-    Edge.implies modifiedNewtonianDynamics baryonicLensingCoincidencePrediction,
-
-    Edge.interprets flatRotationCurvePrediction rubin1970RotationCurves
-      "Flat rotation curves refute purely visible Newtonian mass and support MOND / Dark Matter.",
-    Edge.interprets separatedLensingMassPeakPrediction bulletCluster2006
-      "Spatial separation of lensing mass from baryonic gas refutes purely modified gravity MOND and supports collisionless Dark Matter."
+    -- Interpretations
+    Edge.interprets asymptoticFlatRotationPrediction galacticRotationCurves1970
+      "Flat galactic rotation curves support both MOND and Dark Matter asymptotic velocity models.",
+    Edge.interprets gasLensMassSeparationPrediction bulletCluster2006
+      "Mass-gas offset in colliding clusters refutes pure MOND field modifications and supports particle dark matter.",
+    Edge.interprets cmbAcousticPeakRatioPrediction planckCmbAnisotropies
+      "CMB acoustic peak ratios validate cold dark matter density cosmological parameters."
   ]
 
 
-/-! ## Analysis & Scoreboards -/
+/-! ## Multi-Experiment Analysis & Scoreboards -/
 
 def experiments : List (String × Experiment) :=
-  [ ("Rubin1970RotationCurves", rubin1970RotationCurves),
-    ("BulletCluster2006", bulletCluster2006) ]
+  [ ("GalacticRotation1970", galacticRotationCurves1970),
+    ("BulletCluster2006", bulletCluster2006),
+    ("PlanckCMB2018", planckCmbAnisotropies) ]
 
 def verdict (world : List Theory) (e : Experiment) : String :=
   if evidenceGraph.refutes world e then "refuted"
@@ -91,36 +108,29 @@ def verdict (world : List Theory) (e : Experiment) : String :=
 def scoreboard (world : List Theory) : List (String × String) :=
   experiments.map fun (name, e) => (name, verdict world e)
 
-def worldStandardNewton : List Theory := [
-  standardBaryonicNewtonianDynamics,
-  galacticRotationProbe,
-  clusterCollisionLensingProbe
-]
-
-def worldColdDarkMatter : List Theory := [
-  coldDarkMatterHypothesis,
-  galacticRotationProbe,
-  clusterCollisionLensingProbe
-]
-
 def worldMOND : List Theory := [
-  modifiedNewtonianDynamics,
-  galacticRotationProbe,
-  clusterCollisionLensingProbe
+  modifiedNewtonianDynamicsTheory,
+  stellarKinematicsProbe,
+  collidingClusterProbe,
+  cmbAnisotropyProbe
 ]
 
-#eval scoreboard worldStandardNewton
-#eval scoreboard worldColdDarkMatter
+def worldCDM : List Theory := [
+  coldDarkMatterCosmologyTheory,
+  stellarKinematicsProbe,
+  collidingClusterProbe,
+  cmbAnisotropyProbe
+]
+
 #eval scoreboard worldMOND
+#eval scoreboard worldCDM
 
 
 /-! ## Compilation Guards -/
 
 #guard evidenceGraph.wellFormed
-#guard evidenceGraph.refutes worldStandardNewton rubin1970RotationCurves
-#guard evidenceGraph.supports worldColdDarkMatter rubin1970RotationCurves
-#guard evidenceGraph.supports worldColdDarkMatter bulletCluster2006
-#guard evidenceGraph.supports worldMOND rubin1970RotationCurves
 #guard evidenceGraph.refutes worldMOND bulletCluster2006
+#guard evidenceGraph.supports worldCDM bulletCluster2006
+#guard evidenceGraph.supports worldCDM planckCmbAnisotropies
 
 end Scilib.Astrophysics
