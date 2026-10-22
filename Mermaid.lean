@@ -17,6 +17,7 @@ import Scilib.BaadeSTwo
 import Scilib.LkMaterialsRivals
 import Scilib.GevDiphotonExcess
 import Scilib.PenziasWilsonHolmdel
+import Scilib.JohnSnowAnd
 
 open Scilib
 
@@ -144,6 +145,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "750 GeV diphoton excess (2015-16)" Scilib.GevDiphotonExcess.evidenceGraph)
   IO.FS.writeFile "viz/penzias-wilson-cmb.md"
     (toMarkdown "Penzias-Wilson, Holmdel horn antenna (1964-65)" Scilib.PenziasWilsonHolmdel.evidenceGraph)
+  IO.FS.writeFile "viz/john-snow-cholera.md"
+    (toMarkdown "John Snow and cholera, London 1854" Scilib.JohnSnowAnd.evidenceGraph)
   
 
 end Mermaid
