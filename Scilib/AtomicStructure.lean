@@ -1,4 +1,4 @@
-import Basic
+import Scilib.Basic
 
 namespace Scilib.AtomicStructure
 
