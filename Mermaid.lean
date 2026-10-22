@@ -2,6 +2,7 @@ import Scilib.ShapeOfEarth
 import Scilib.Heliocentrism
 import Scilib.Semiconductor
 import Scilib.HeatCapacityOfSolids
+import Scilib.Superconductors
 import Scilib.Rainbow
 
 open Scilib
@@ -100,6 +101,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Semiconductor" Scilib.Semiconductor.evidenceGraph)
   IO.FS.writeFile "viz/heat-capacity.md"
     (toMarkdown "Heat capacity of solids" Scilib.HeatCapacity.evidenceGraph)
+  IO.FS.writeFile "viz/superconductors.md"
+    (toMarkdown "Superconductors" Scilib.Superconductors.evidenceGraph)
   IO.FS.writeFile "viz/rainbow.md"
     (toMarkdown "Rainbow" Scilib.Rainbow.evidenceGraph)
 
