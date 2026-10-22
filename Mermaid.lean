@@ -1,6 +1,7 @@
 import Scilib.ShapeOfEarth
 import Scilib.Heliocentrism
 import Scilib.Semiconductor
+import Scilib.HeatCapacityOfSolids
 
 open Scilib
 
@@ -96,6 +97,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Heliocentrism" Scilib.Heliocentrism.evidenceGraph)
   IO.FS.writeFile "viz/semiconductor.md"
     (toMarkdown "Semiconductor" Scilib.Semiconductor.evidenceGraph)
+  IO.FS.writeFile "viz/heat-capacity.md"
+    (toMarkdown "Heat capacity of solids" Scilib.HeatCapacity.evidenceGraph)
 
 end Mermaid
 
