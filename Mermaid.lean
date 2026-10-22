@@ -10,6 +10,16 @@ import Scilib.Bernoulli
 import Scilib.Leidenfrost
 import Scilib.Diffraction
 import Scilib.Bragg
+import Scilib.MendeleevSPeriodic
+import Scilib.MeselsonStahl
+import Scilib.OperaFasterThan
+import Scilib.BaadeSTwo
+import Scilib.LkMaterialsRivals
+import Scilib.GevDiphotonExcess
+import Scilib.PenziasWilsonHolmdel
+import Scilib.JohnSnowAnd
+import Scilib.ThalidomideAcrossSpecies
+import Scilib.TheEtherAnd
 
 open Scilib
 
@@ -123,6 +133,26 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Light Diffraction" Scilib.Diffraction.evidenceGraph)
   IO.FS.writeFile "viz/bragg.md" 
     (toMarkdown "Bragg's Law & X-Ray Crystallography" Scilib.Bragg.evidenceGraph)
+  IO.FS.writeFile "viz/mendeleev-periodic-law.md"
+    (toMarkdown "Mendeleev's periodic law (1869-86)" Scilib.MendeleevSPeriodic.evidenceGraph)
+  IO.FS.writeFile "viz/meselson-stahl.md"
+    (toMarkdown "Meselson-Stahl (1958)" Scilib.MeselsonStahl.evidenceGraph)
+  IO.FS.writeFile "viz/opera-neutrinos.md"
+    (toMarkdown "OPERA faster-than-light neutrinos (2011-12)" Scilib.OperaFasterThan.evidenceGraph)
+  IO.FS.writeFile "viz/baade-cepheids.md"
+    (toMarkdown "Baade's two Cepheid populations (1952)" Scilib.BaadeSTwo.evidenceGraph)
+  IO.FS.writeFile "viz/lk-99.md"
+    (toMarkdown "LK-99 (2023)" Scilib.LkMaterialsRivals.evidenceGraph)
+  IO.FS.writeFile "viz/750-gev-excess.md"
+    (toMarkdown "750 GeV diphoton excess (2015-16)" Scilib.GevDiphotonExcess.evidenceGraph)
+  IO.FS.writeFile "viz/penzias-wilson-cmb.md"
+    (toMarkdown "Penzias-Wilson, Holmdel horn antenna (1964-65)" Scilib.PenziasWilsonHolmdel.evidenceGraph)
+  IO.FS.writeFile "viz/john-snow-cholera.md"
+    (toMarkdown "John Snow and cholera, London 1854" Scilib.JohnSnowAnd.evidenceGraph)
+  IO.FS.writeFile "viz/thalidomide.md"
+    (toMarkdown "Thalidomide across species" Scilib.ThalidomideAcrossSpecies.evidenceGraph)
+  IO.FS.writeFile "viz/ether-michelson-morley.md"
+    (toMarkdown "The ether and the speed of light (1810-1938)" Scilib.TheEtherAnd.evidenceGraph)
   
 
 end Mermaid
