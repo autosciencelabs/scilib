@@ -1,56 +1,96 @@
 import Scilib.Basic
+import Scilib.Formalization.Bernoulli
 
 namespace Scilib.Bernoulli
 
-open Scilib
+open Scilib Scilib.Formalization.Bernoulli
 
 /-! ## Theories & Core Principles -/
 
 def bernoulliPrinciple : Theory := {
+  formal := [``BernoulliPrinciple, ``pressureEnergy_eq_physlib]
   statement := "Along a streamline in steady flow with no energy added, pressure plus kinetic energy density plus potential energy density is constant."
   sources := ["Daniel Bernoulli, Hydrodynamica, 1738"]
 }
 
 def continuityEquation : Theory := {
+  formal := [``ContinuityEquation]
   statement := "For incompressible flow, the volume flow rate (area times speed) is constant across any cross-section of a pipe."
 }
 
 def extendedLossModel : Theory := {
+  formal := [``ExtendedLossModel]
   statement := "Bernoulli's equation extended with a viscous energy-loss term describes real fluid dissipation."
   sources := ["Saleta et al."]
 }
 
 def compressibilityModel : Theory := {
+  formal := [``CompressibilityModel]
   statement := "For compressible flow, the energy equation includes enthalpy changes, causing stagnation pressure rise to exceed the incompressible term by a Mach-dependent factor."
 }
 
 def boundarySeparationModel : Theory := {
+  formal := [``BoundarySeparationModel]
   statement := "Beyond a critical angle of attack, the boundary layer separates from an airfoil upper surface, causing lift to drop (stall)."
 }
 
 /-! ## Domain Assumptions & Overreaches -/
 
-def steadyFlow : Theory := { statement := "The flow is steady over the time of interest." }
-def alongStreamline : Theory := { statement := "The points being compared lie on the same streamline." }
-def noEnergyAdded : Theory := { statement := "No pump or friction adds/removes energy between points." }
-def incompressibleLowSpeed : Theory := { statement := "Density changes are negligible (Mach well below 0.3)." }
+def steadyFlow : Theory := {
+  formal := [``SteadyFlow]
+  statement := "The flow is steady over the time of interest." }
+def alongStreamline : Theory := {
+  formal := [``AlongStreamline]
+  statement := "The points being compared lie on the same streamline." }
+def noEnergyAdded : Theory := {
+  formal := [``NoEnergyAdded]
+  statement := "No pump or friction adds/removes energy between points." }
+def incompressibleLowSpeed : Theory := {
+  formal := [``IncompressibleLowSpeed]
+  statement := "Density changes are negligible (Mach well below 0.3)." }
 
-def idealAtHighSpeed : Theory := { statement := "Incompressibility is assumed to hold even at moderate subsonic speeds (e.g., Mach 0.6)." }
-def idealAtHighAngle : Theory := { statement := "Attached ideal flow is assumed to persist at every arbitrary angle of attack." }
-def losslessDrainage : Theory := { statement := "Viscous friction is assumed negligible while a vessel drains through an orifice." }
+def idealAtHighSpeed : Theory := {
+  formal := [``IdealAtHighSpeed]
+  statement := "Incompressibility is assumed to hold even at moderate subsonic speeds (e.g., Mach 0.6)." }
+def idealAtHighAngle : Theory := {
+  formal := [``IdealAtHighAngle]
+  statement := "Attached ideal flow is assumed to persist at every arbitrary angle of attack." }
+def losslessDrainage : Theory := {
+  formal := [``LosslessDrainage]
+  statement := "Viscous friction is assumed negligible while a vessel drains through an orifice." }
 
 /-! ## Derived Claims & Predictions -/
 
-def pressureDropsWithSpeed : Theory := { statement := "Along a streamline, static pressure is lower where flow speed is higher." }
-def speedUpInConstriction : Theory := { statement := "Incompressible fluid accelerates in a narrower pipe section." }
-def venturiPrediction : Theory := { statement := "Static pressure in a venturi throat is lower than at the inlet." }
-def lowSpeedLiftPrediction : Theory := { statement := "At low speed and low angle, airfoil lift matches integrated surface pressure differences." }
-def highSpeedStagnationPrediction : Theory := { statement := "At Mach 0.6, stagnation pressure rise equals one-half rho v squared." }
-def highSpeedDeviationObs : Theory := { statement := "At Mach 0.6, measured stagnation pressure rise exceeds one-half rho v squared by roughly 9 percent." }
-def stallPrediction : Theory := { statement := "Lift keeps increasing monotonically as the angle of attack increases." }
-def stallObs : Theory := { statement := "Past a critical angle of attack, lift falls due to flow separation." }
-def losslessDrainPrediction : Theory := { statement := "A draining vessel follows the lossless Torricelli law exactly." }
-def drainDeviationObs : Theory := { statement := "Measured drainage deviates from lossless Torricelli law and requires a viscous energy-loss term." }
+def pressureDropsWithSpeed : Theory := {
+  formal := [``PressureDropsWithSpeed, ``pressureDropsWithSpeed_proof]
+  statement := "Along a streamline, static pressure is lower where flow speed is higher." }
+def speedUpInConstriction : Theory := {
+  formal := [``SpeedUpInConstriction, ``speedUpInConstriction_proof]
+  statement := "Incompressible fluid accelerates in a narrower pipe section." }
+def venturiPrediction : Theory := {
+  formal := [``VenturiPrediction, ``venturiPrediction_proof]
+  statement := "Static pressure in a venturi throat is lower than at the inlet." }
+def lowSpeedLiftPrediction : Theory := {
+  formal := [``LowSpeedLiftPrediction]
+  statement := "At low speed and low angle, airfoil lift matches integrated surface pressure differences." }
+def highSpeedStagnationPrediction : Theory := {
+  formal := [``HighSpeedStagnationPrediction]
+  statement := "At Mach 0.6, stagnation pressure rise equals one-half rho v squared." }
+def highSpeedDeviationObs : Theory := {
+  formal := [``HighSpeedDeviationObs]
+  statement := "At Mach 0.6, measured stagnation pressure rise exceeds one-half rho v squared by roughly 9 percent." }
+def stallPrediction : Theory := {
+  formal := [``StallPrediction]
+  statement := "Lift keeps increasing monotonically as the angle of attack increases." }
+def stallObs : Theory := {
+  formal := [``StallObs]
+  statement := "Past a critical angle of attack, lift falls due to flow separation." }
+def losslessDrainPrediction : Theory := {
+  formal := [``LosslessDrainPrediction]
+  statement := "A draining vessel follows the lossless Torricelli law exactly." }
+def drainDeviationObs : Theory := {
+  formal := [``DrainDeviationObs]
+  statement := "Measured drainage deviates from lossless Torricelli law and requires a viscous energy-loss term." }
 
 /-! ## Raw Experiments -/
 

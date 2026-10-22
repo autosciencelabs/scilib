@@ -1,27 +1,32 @@
 import Scilib.Basic
+import Scilib.Formalization.Bragg
 
 namespace Scilib.Bragg
 
-open Scilib
+open Scilib Scilib.Formalization.Bragg
 
 /-! ## Theories & Models -/
 
 def crystalLattice : Theory := {
+  formal := [``CrystalLattice, ``sitePosition_translate]
   statement := "A crystal consists of a periodic array of atoms or ions forming planes capable of scattering radiation."
   sources := ["Crystallography principles"]
 }
 
 def braggsLaw : Theory := {
+  formal := [``BraggsLaw, ``constructive_of_bragg, ``braggsLaw_proof]
   statement := "Constructive interference of X-rays scattered from adjacent crystal planes occurs when n times lambda equals 2 times d times sin(theta)."
   sources := ["William Henry Bragg and William Lawrence Bragg, 1913"]
 }
 
 def waveNatureOfXRays : Theory := {
+  formal := [``WaveNatureOfXRays, ``monochromatic_satisfies_maxwell]
   statement := "X-rays propagate as electromagnetic waves with wavelengths comparable to atomic spacing in crystals."
   sources := ["Max von Laue, 1912"]
 }
 
 def randomAmorphousStructure : Theory := {
+  formal := [``RandomAmorphousStructure]
   statement := "The target material lacks long-range periodic atomic order."
 }
 
@@ -29,11 +34,13 @@ def randomAmorphousStructure : Theory := {
 /-! ## Experimental Probes & Regimes -/
 
 def monochromaticXRayBeam : Theory := {
+  formal := [``MonochromaticXRayBeam]
   statement := "A collimated beam of X-rays possessing a single well-defined wavelength."
   sources := ["X-ray tube apparatus"]
 }
 
 def singleCrystalTarget : Theory := {
+  formal := [``SingleCrystalTarget]
   statement := "A high-purity single crystal mounted on a goniometer for precise angular rotation."
   sources := ["Crystalline sample"]
 }
@@ -42,10 +49,12 @@ def singleCrystalTarget : Theory := {
 /-! ## Derived Claims & Predictions -/
 
 def braggPeakPrediction : Theory := {
+  formal := [``BraggPeakPrediction, ``stackIntensity_at_bragg, ``bragg_is_global_max]
   statement := "Monochromatic X-rays incident on a crystal produce sharp reflection peaks at specific angles satisfying Bragg's law."
 }
 
 def amorphousDiffuseScattering : Theory := {
+  formal := [``AmorphousDiffuseScattering]
   statement := "Amorphous materials yield broad diffuse scattering halos rather than sharp Bragg diffraction peaks."
 }
 

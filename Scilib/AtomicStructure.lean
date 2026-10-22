@@ -1,22 +1,29 @@
-import Basic
+import Scilib.Basic
+import Scilib.Formalization.AtomicStructure
 
 namespace Scilib.AtomicStructure
+
+open Scilib.Formalization.AtomicStructure
 
 /-! ## Theories & Models -/
 
 def subatomicElectronTheory : Theory where
+  formal := [``SubatomicElectronTheory, ``electron_specific_charge]
   statement := "Cathode rays consist of universal subatomic negatively charged corpuscles (electrons) emitted by all matter."
   sources := ["J.J. Thomson, 1897"]
 
 def thomsonModel : Theory where
+  formal := [``ThomsonModel]
   statement := "Thomson Plum Pudding Model: The atom is a uniform sphere of positive charge with embedded electrons."
   sources := ["J.J. Thomson, 1904"]
 
 def rutherfordModel : Theory where
+  formal := [``RutherfordModel]
   statement := "Rutherford Nuclear Model: Positive charge and nearly all mass are concentrated in a tiny, dense central nucleus."
   sources := ["Ernest Rutherford, 1911"]
 
 def bohrModel : Theory where
+  formal := [``BohrModel, ``bohr_energy_ordered]
   statement := "Bohr Quantized Model: Electrons orbit the nucleus only in specific discrete stationary states with quantized energy levels."
   sources := ["Niels Bohr, 1913"]
 
@@ -24,18 +31,22 @@ def bohrModel : Theory where
 /-! ## Experimental Probes & Regimes -/
 
 def vacuumCathodeTube : Theory where
+  formal := [``VacuumCathodeTube]
   statement := "High-voltage electric field applied across a low-pressure gas discharge tube."
   sources := ["Cathode ray apparatus"]
 
 def alphaParticleBeam : Theory where
+  formal := [``AlphaParticleBeam]
   statement := "High-energy doubly-ionized helium atoms (alpha particles) used as scattering probes."
   sources := ["Geiger & Marsden"]
 
 def mercuryVaporTube : Theory where
+  formal := [``MercuryVaporTube]
   statement := "Low-pressure mercury vapor bombarded with thermionic electrons of controlled kinetic energy."
   sources := ["Franck & Hertz setup"]
 
 def hydrogenDischargeTube : Theory where
+  formal := [``HydrogenDischargeTube]
   statement := "Low-pressure hydrogen gas excited by electrical discharge."
   sources := ["Spectroscopy setup"]
 
@@ -43,19 +54,25 @@ def hydrogenDischargeTube : Theory where
 /-! ## Derived Claims & Predictions -/
 
 def universalChargeToMassRatio : Theory :=
-  { statement := "Emitted corpuscles exhibit a constant, high charge-to-mass ratio independent of cathode material." }
+  { formal := [``UniversalChargeToMassRatio, ``electron_ratio_universal]
+    statement := "Emitted corpuscles exhibit a constant, high charge-to-mass ratio independent of cathode material." }
 
 def smallAngleScatteringOnly : Theory :=
-  { statement := "Alpha particles pass through the atom with very small deflections." }
+  { formal := [``SmallAngleScatteringOnly, ``small_large_incompatible]
+    statement := "Alpha particles pass through the atom with very small deflections." }
 
 def largeAngleBackscattering : Theory :=
-  { statement := "Alpha particles experience intense Coulomb repulsion from a massive point charge, resulting in wide deflections." }
+  { formal := [``LargeAngleBackscattering, ``rutherford_large_deflection, ``rutherford_backscattering]
+    statement := "Alpha particles experience intense Coulomb repulsion from a massive point charge, resulting in wide deflections." }
 
 def discreteEnergyTransfer : Theory :=
-  { statement := "Electrons transfer energy to atoms in strict, discrete packets (excitation potentials), causing sudden drops in current." }
+  { formal := [``DiscreteEnergyTransfer]
+    statement := "Electrons transfer energy to atoms in strict, discrete packets (excitation potentials), causing sudden drops in current." }
 
 def discreteSpectralLines : Theory :=
-  { statement := "Emitted light consists of discrete frequencies corresponding to quantum jumps between energy levels." }
+  { formal := [``DiscreteSpectralLines, ``bohr_to_spectral_lines, ``spectral_frequency_positive,
+      ``spectral_frequencies_countable, ``photon_energy_balance, ``balmer_formula, ``balmer_lines_distinct]
+    statement := "Emitted light consists of discrete frequencies corresponding to quantum jumps between energy levels." }
 
 
 /-! ## Raw Experiments -/
