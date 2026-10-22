@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Superconductivity as an Evidence Graph</title>
+<style>
+:root{--bg:#d9d7d1;--page:#fffefb;--card:#fffefb;--fg:#1a1a1a;--muted:#555;--line:#333;--bd:#1a1a1a;--band:#f5f2ea;
+--serif:Georgia,"Times New Roman","Latin Modern Roman",serif;--tt:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}}
+:root[data-theme="dark"]{--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+main{background:var(--page);max-width:1000px;margin:24px auto;padding:56px 56px 48px;box-shadow:0 2px 18px #0003}
+@media (max-width:700px){main{margin:0;padding:28px 16px}}
+h1{font-weight:400;font-size:1.9rem;text-align:center;margin:0 0 .5rem;line-height:1.2}
+p.auth,p.date{text-align:center;margin:0;font-size:1.05rem}p.date{color:var(--muted);margin-bottom:1.4rem}
+.abs{margin:0 auto 1.4rem;max-width:36rem;font-size:.95rem;line-height:1.5;text-align:justify}
+.abs b{display:block;text-align:center;margin-bottom:.3rem}
+h2{font-size:1.2rem;margin:1.8rem 0 .6rem}
+code{font-family:var(--tt);font-size:.88em}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font-family:var(--serif);font-size:.92rem;padding:5px 12px;border:1px solid var(--fg);border-radius:0;background:transparent;color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--page)}
+.wrap{overflow-x:auto}
+svg{display:block;width:100%;min-width:860px;height:auto}
+svg text{font-family:var(--serif);font-style:normal;font-size:14.5px;fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+#status{margin-top:10px;font-size:.97rem;line-height:1.5}
+.cap{text-align:justify;font-size:.9rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.86rem;color:var(--muted)}
+.leg i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--fg)}
+table{border-collapse:collapse;margin:0 auto;font-size:.97rem;width:100%}
+th,td{padding:6px 14px;text-align:left}
+thead tr{border-top:2px solid var(--fg);border-bottom:1px solid var(--fg)}
+tbody tr:last-child{border-bottom:2px solid var(--fg)}
+th.on,td.on{background:var(--band)}
+#tip{position:fixed;pointer-events:none;max-width:340px;background:var(--card);color:var(--fg);border:1px solid var(--bd);padding:8px 10px;font-size:.88rem;line-height:1.35;display:none;z-index:9}
+#tip b{display:block}#tip span{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Superconductivity as an Evidence Graph</h1>
+<p class="auth">Evidence graph of <code>Scilib.Superconductivity</code>, written in Lean&nbsp;4</p>
+<p class="date">October 21, 2026</p>
+<div class="abs"><b>Abstract</b>Superconductivity brings electrical resistance down to zero and expels magnetic fields. While a simple phenomenological or resistance-only model accounts for basic zero-resistance drops, the full microscopic BCS theory and electron-phonon coupling model explain magnetic flux expulsion, isotope effects, and specific heat gaps. Explore each test, what models predict, and how background worlds handle them.</div>
+
+<h2>1&ensp;The evidence graph</h2>
+<div class="bar" id="bar"></div>
+<div class="wrap"><svg id="g" viewBox="0 0 1000 750" role="img" aria-label="Evidence graph of Superconductivity"></svg></div>
+<div id="status"></div>
+<p class="cap"><b>Figure 1:</b> One row for each experiment. On the left is what the background theory predicts. The experiment is on the right, with its verdict for each world in words. Small coloured dots on a box show which worlds include it: blue for pure resistance, teal for London phenomenological, and orange for full BCS theory.</p>
+
+<h2>2&ensp;What each world concludes</h2>
+<table id="tab"></table>
+<p class="cap"><b>Table 1:</b> Verdict for each experiment. “Supported” means the world leads to what was observed. “Silent” means the world says nothing about it. The selected world is shaded.</p>
+<div class="leg" id="leg"></div>
+</main>
+<div id="tip"></div>
+<script>
+var NS="http://www.w3.org/2000/svg";
+var N={
+1:["perfectConduction","theory","Perfect conduction","zero electrical resistance","A metal can enter a state of zero electrical resistance where current persists indefinitely without a driving field. (Onnes, 1911)"],
+2:["londonTheory","theory","London theory","macroscopic Maxwell modifications","Superconductivity described by Maxwell modifications yielding magnetic field expulsion and penetration depth. (F. & H. London, 1935)"],
+3:["bcsTheory","theory","BCS theory","Cooper pairs & energy gap","Electrons form bound pairs via virtual phonon exchanges, creating an electronic energy gap. (Bardeen, Cooper, Schrieffer, 1957)"],
+4:["electronPhononCoupling","theory","Electron-phonon coupling","inverse square root mass effect","The superconducting transition temperature depends inversely on isotopic mass of lattice ions."],
+5:["lowFieldLimit","theory","Low field limit","field below critical limit","The applied magnetic field is far below the material's critical magnetic field."],
+6:["lowTempLimit","theory","Low temperature limit","temperature below T_c","The operating temperature is far below the transition temperature T_c."],
+7:["pureSample","theory","Pure sample","negligible impurities","The metallic sample has negligible chemical impurities and lattice defects."],
+8:["fieldCoolingEquilibrium","theory","Field cooling equilibrium","thermodynamic equilibrium","Magnetic flux expulsion measured under true thermodynamic equilibrium."],
+9:["isotopicPurity","theory","Isotopic purity","single isotope species","Tested samples consist of a single isolated isotope species with well-defined atomic mass."],
+10:["standardCalorimetricSeparation","theory","Calorimetric separation","clean specific heat split","Electronic and lattice specific heat contributions cleanly separated across transition."],
+11:["vanishingResistivity","claim","Resistivity vanishes","drops below sharp T_c","Electrical resistance drops to an unmeasurable value below a sharp transition temperature T_c."],
+12:["magneticFluxExpulsion","claim","Magnetic flux expulsion","B vanishes inside bulk","Magnetic induction B vanishes entirely inside bulk superconductor."],
+13:["electronicEnergyGap","claim","Electronic energy gap","minimum threshold 2Δ","Minimum energy threshold of 2Δ to break a Cooper pair."],
+14:["inverseSquareRootMassDependence","claim","Isotope mass dependence","T_c proportional to M^{-1/2}","Critical transition temperature is proportional to isotopic mass to the power of negative one half."],
+15:["onnesResistanceDropPrediction","claim","Resistance drops at 4.2 K","relies on pure sample","Measured electrical resistance of solid mercury vanishes abruptly below 4.2 K."],
+16:["meissnerExpulsionPrediction","claim","Meissner flux expulsion","relies on low field & equilibrium","Superconducting sample cooled in a field expels flux entirely as complete diamagnet."],
+17:["bcsExponentialHeatCapacityPrediction","claim","Exponential heat capacity drop","relies on energy gap & low temp","Electronic specific heat drops exponentially at temperatures well below T_c."],
+18:["isotopeShiftPrediction","claim","Isotope shift prediction","relies on isotopic purity","Different stable isotopes exhibit shifted critical temperatures scaling with atomic weight."],
+19:["onnes1911","experiment","Onnes mercury test (1911)","liquid helium cryostat","Measure electrical resistance of solid mercury down to 4.2 K; resistance drops to zero. (Onnes, 1911)"],
+20:["meissner1933","experiment","Meissner field test (1933)","tin & lead single crystals","Cool single crystals in applied field and map flux distribution; magnetic induction drops to zero. (Meissner & Ochsenfeld, 1933)"],
+21:["corak1954","experiment","Corak specific heat (1954)","vanadium or tin sub-kelvin","Measure low-temperature specific heat down to sub-kelvin ranges; specific heat falls off exponentially. (Corak et al., 1954)"],
+22:["isotopeEffect1950","experiment","Isotope effect test (1950)","separated isotope fractions","Synthesize pure superconducting samples using distinct isotope fractions; T_c varies with mass. (Maxwell; Reynolds et al., 1950)"]
+};
+
+var E=[
+{t:[1,7],h:15,k:"implies",n:"Perfect conduction and pure sample give resistance drop"},
+{t:[15],h:19,k:"interprets",n:"Onnes resistance drop confirmation"},
+{t:[12,5,8],h:16,k:"implies",n:"Flux expulsion and auxiliary conditions predict Meissner effect"},
+{t:[16],h:20,k:"interprets",n:"Meissner flux expulsion confirmation"},
+{t:[13,6,10],h:17,k:"implies",n:"Energy gap and low temperature predict specific heat drop"},
+{t:[17],h:21,k:"interprets",n:"Corak specific heat confirmation"},
+{t:[14,9],h:18,k:"implies",n:"Mass dependence and purity predict isotope shift"},
+{t:[18],h:22,k:"interprets",n:"Isotope effect confirmation"},
+{t:[1],h:11,k:"implies",n:"Perfect conduction leads to vanishing resistivity"},
+{t:[2],h:12,k:"implies",n:"London theory leads to magnetic flux expulsion"},
+{t:[2],h:11,k:"implies",n:"London theory leads to vanishing resistivity"},
+{t:[3],h:11,k:"implies",n:"BCS theory leads to vanishing resistivity"},
+{t:[3],h:12,k:"implies",n:"BCS theory leads to magnetic flux expulsion"},
+{t:[3],h:13,k:"implies",n:"BCS theory leads to electronic energy gap"},
+{t:[4],h:14,k:"implies",n:"Electron-phonon coupling leads to mass dependence"}
+];
+
+var C=[];
+var W={
+  worldPureResistanceOnly:{m:[1,7,5,6,8,9,10],c:"#2f4b8f",lb:"Pure resistance only"},
+  worldLondonPhenomenological:{m:[1,2,7,5,6,8,9,10],c:"#17707a",lb:"London phenomenological"},
+  worldBcsFullTheory:{m:[3,4,7,5,6,8,9,10],c:"#e0792f",lb:"Full BCS theory"}
+};
+
+var VC={supported:"#2e8b6e",refuted:"#d63b2b",silent:"#dcd8cf"},KC={theory:"#8a4fa0",claim:"#e0792f",experiment:"#555"};
+
+function verdict(set){
+  var D={}; set.forEach(function(i){D[i]=1}); var ch=1;
+  while(ch){
+    ch=0;
+    E.forEach(function(e){
+      if(e.k=="implies" && !D[e.h] && e.t.every(function(x){return D[x]})){ D[e.h]=1; ch=1; }
+    });
+  }
+  var out={};
+  E.forEach(function(e){
+    if(e.k!="interprets") return;
+    var o=e.t[0];
+    var bad=C.some(function(c){return (c[0]==o && D[c[1]])||(c[1]==o && D[c[0]])});
+    out[e.h] = bad ? "refuted" : D[o] ? "supported" : "silent";
+  });
+  return {out:out, claims:D};
+}
+
+var V={}; for(var w in W) V[w]=verdict(W[w].m);
+var svg=document.getElementById("g"), tip=document.getElementById("tip"), mode="both";
+
+function el(t,a,p){var e=document.createElementNS(NS,t); for(var k in a)e.setAttribute(k,a[k]); (p||svg).appendChild(e); return e;}
+var defs=el("defs",{});
+[["a","var(--line)"],["ab","#2b6cb0"],["ac","#d63b2b"]].forEach(function(d){
+  var m=el("marker",{id:d[0],viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},defs);
+  el("path",{d:"M0 0L10 5L0 10z",fill:d[1]},m);
+});
+
+function showTip(ev,h,b){
+  tip.innerHTML="<b>"+h+"</b><span>"+b+"</span>"; tip.style.display="block";
+  var w=tip.offsetWidth; tip.style.left=Math.min(ev.clientX+14, innerWidth-w-8)+"px"; tip.style.top=(ev.clientY+14)+"px";
+}
+function hover(n,h,b){
+  n.addEventListener("mousemove",function(e){showTip(e,h,b)});
+  n.addEventListener("mouseleave",function(){tip.style.display="none"});
+  n.addEventListener("click",function(e){showTip(e,h,b)});
+}
+
+var LANES=[
+  ["1  Zero Electrical Resistance", 185, 15, 19],
+  ["2  Meissner Magnetic Flux Expulsion", 325, 16, 20],
+  ["3  Electronic Specific Heat Gap", 465, 17, 21],
+  ["4  Isotope Mass Shift Effect", 605, 18, 22]
+];
+var POS={pred:130,exp:670}, BW=210, BH=58, RY=75;
+
+function relies(id){
+  var e=E.filter(function(x){return x.h==id && x.k=="implies"})[0];
+  return e ? "<br>Relies on: "+e.t.map(function(t){return N[t][2]}).join(", ") : "";
+}
+
+function draw(){
+  svg.querySelectorAll(".dyn").forEach(function(n){n.remove()});
+  var g=el("g",{"class":"dyn"}), sel=mode=="both"?null:mode, mem=sel?W[sel].m:null;
+  var dim=function(i){var k=N[i][1]; if(!sel) return false; if(k=="theory") return mem.indexOf(i)<0; if(k=="claim") return !V[sel].claims[i]; return false;};
+  var inW=function(w,i){var k=N[i][1]; return k=="theory"?W[w].m.indexOf(i)>=0 : k=="claim"?!!V[w].claims[i] : true;};
+  var wn=Object.keys(W);
+
+  function node(i,x,y){
+    var n=N[i], kind=n[1], grp=el("g",{opacity:dim(i)?.28:1,style:"cursor:help"},g);
+    el("rect",{x:x-BW/2,y:y-BH/2,width:BW,height:BH,rx:3,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},grp);
+    el("rect",{x:x-BW/2,y:y-BH/2,width:7,height:BH,fill:KC[kind]},grp);
+    var t=el("text",{x:x-BW/2+18,y:y-(n[3]?4:-5),style:"font-weight:600;stroke:none"},grp); t.textContent=n[2];
+    if(n[3]){ var u=el("text",{x:x-BW/2+18,y:y+16,style:"font-size:12.5px;fill:var(--muted);stroke:none"},grp); u.textContent=n[3]; }
+    if(!sel && kind!="experiment") wn.forEach(function(w,j){if(inW(w,i)) el("circle",{cx:x+BW/2-12-j*14,cy:y-BH/2+10,r:4.5,fill:W[w].c},grp);});
+    hover(grp,n[2],n[4]+"<br><code>"+n[0]+"</code>"+(kind=="claim"?relies(i):""));
+  }
+
+  function link(x1,y1,x2,y2,col,k,note,dash,both){
+    el("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:col,"stroke-width":1.8,"stroke-dasharray":dash||"none","marker-end":"url(#"+(k=="implies"?"ab":k=="contradicts"?"ac":"a")+")"},g);
+    if(both) g.lastChild.setAttribute("marker-start","url(#ac)");
+    var hx=(x1+x2)/2, hy=(y1+y2)/2, s=el("rect",{x:hx-6,y:hy-6,width:12,height:12,fill:k=="implies"||k=="contradicts"?"var(--card)":col,stroke:col,"stroke-width":1.8,style:"cursor:help"},g);
+    hover(s,k=="implies"?"leads to":k=="contradicts"?"cannot both be true":"was tested by",note);
+  }
+
+  // Header banner
+  el("rect",{x:20,y:40,width:960,height:62,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},g);
+  el("rect",{x:20,y:40,width:7,height:62,fill:KC.theory},g);
+  el("text",{x:42,y:66,style:"font-weight:600;stroke:none"},g).textContent="Superconductivity Foundations";
+  el("text",{x:42,y:88,style:"font-size:13px;fill:var(--muted);stroke:none"},g).textContent="Core models range from pure resistance phenomenology to microscopic BCS theory and electron-phonon coupling.";
+
+  [["WHAT THEORY PREDICTS",POS.pred],["THE EXPERIMENT",POS.exp]].forEach(function(h){
+    var t=el("text",{x:h[1],y:135,"text-anchor":"middle",style:"letter-spacing:.05em;fill:var(--muted);stroke:none;font-size:12px"},g);
+    t.textContent=h[0];
+  });
+
+  var top=145;
+  LANES.forEach(function(L,li){
+    var y=L[1], bottom=y+65;
+    if(li%2==0) el("rect",{x:6,y:top,width:988,height:135,fill:"var(--band)"},g);
+    el("text",{x:20,y:top+17,style:"font-weight:700;stroke:none;font-size:13px;fill:var(--muted)"},g).textContent=L[0];
+
+    var pi=L[2], ei=L[3];
+    link(POS.pred+BW/2,y,POS.exp-BW/2,y,"var(--line)","interprets",E.filter(function(e){return e.h==ei})[0].n);
+    node(pi,POS.pred,y);
+    node(ei,POS.exp,y);
+
+    var ws=sel?[sel]:wn, sy={supported:"✓",refuted:"✗",silent:"—"};
+    ws.forEach(function(w,j){
+      var v=V[w].out[ei], vt=el("text",{x:POS.exp+BW/2+14,y:y-8+j*22,style:"font-weight:600;stroke:none;font-size:13.5px"},g);
+      vt.innerHTML='<tspan style="fill:var(--muted);font-weight:400">'+W[w].lb+':</tspan> <tspan style="fill:'+(v=="silent"?"var(--muted)":VC[v])+'">'+sy[v]+" "+v+"</tspan>";
+    });
+    top+=135;
+  });
+  status();
+}
+
+function tab(){
+  var ws=Object.keys(W), sy={supported:"✓",refuted:"✗",silent:"—"};
+  document.getElementById("tab").innerHTML="<thead><tr><th>Experiment</th>"+ws.map(function(w){return '<th class="'+(mode==w?"on":"")+'">'+w+"</th>"}).join("")+"</tr></thead><tbody>"+
+  [19,20,21,22].map(function(id){return "<tr><td><b>"+N[id][2]+"</b></td>"+ws.map(function(w){var v=V[w].out[id];return '<td class="'+(mode==w?"on":"")+'"><span style="color:'+VC[v]+';font-weight:700">'+sy[v]+"</span> "+v+"</td>"}).join("")+"</tr>"}).join("")+"</tbody>";
+}
+
+function status(){
+  tab(); var s=document.getElementById("status");
+  if(mode=="both"){
+    s.innerHTML="Compare verdicts across background worlds. The <b>Pure resistance world</b> supports Onnes' resistance drop but is <b style='color:"+VC.silent+"'>silent</b> on magnetic flux expulsion, specific heat gaps, and isotope mass shifts. The <b>London world</b> supports both resistance and Meissner expulsion. The <b>Full BCS theory world</b> successfully supports all four physical phenomena.";
+    return;
+  }
+  s.innerHTML = mode=="worldPureResistanceOnly" ?
+    "<b>Pure resistance only</b>: accounts for Onnes' zero-resistance drop, but remains <b style='color:"+VC.silent+"'>silent</b> on magnetic flux expulsion, specific heat gaps, and isotope effects." :
+    mode=="worldLondonPhenomenological" ?
+    "<b>London phenomenological</b>: accounts for both zero resistance and macroscopic magnetic field expulsion, but is <b style='color:"+VC.silent+"'>silent</b> on microscopic specific heat and isotope mass dependence." :
+    "<b>Full BCS theory</b>: incorporates microscopic Cooper pairing, energy gaps, and electron-phonon coupling, successfully <b style='color:"+VC.supported+"'>supporting</b> all four hallmark experiments.";
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll("#bar button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m==m)});
+  draw();
+}
+
+var bar=document.getElementById("bar");
+[["both","Compare all"],["worldPureResistanceOnly","Pure resistance only"],["worldLondonPhenomenological","London phenomenological"],["worldBcsFullTheory","Full BCS theory"]].forEach(function(p){
+  var b=document.createElement("button"); b.textContent=p[1]; b.dataset.m=p[0];
+  b.setAttribute("aria-pressed",p[0]==mode); b.onclick=function(){setMode(p[0])};
+  bar.appendChild(b);
+});
+
+document.getElementById("leg").innerHTML=
+  '<span><i style="background:'+KC.theory+'"></i>model</span>'+
+  '<span><i style="background:'+KC.claim+'"></i>prediction or observation</span>'+
+  '<span><i style="background:'+KC.experiment+'"></i>experiment</span>'+
+  '<span><i style="background:transparent;border:1.5px solid #2b6cb0"></i>leads to</span>'+
+  '<span><i style="background:#555"></i>was tested by</span>'+
+  '<span><i style="background:#2f4b8f;border-radius:50%"></i>Pure resistance world</span>'+
+  '<span><i style="background:#17707a;border-radius:50%"></i>London model world</span>'+
+  '<span><i style="background:#e0792f;border-radius:50%"></i>Full BCS theory world</span>';
+
+draw();
+</script>
+</body>
+</html>

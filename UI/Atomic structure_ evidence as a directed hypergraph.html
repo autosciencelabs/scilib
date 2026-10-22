@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Atomic structure: evidence as a directed hypergraph</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{--bg:#fafaf7;--fg:#1d1d1b;--muted:#6b6b66;--line:#555;--card:#fff;--bd:#d9d9d2;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17181a;--fg:#ececea;--muted:#9a9a94;--line:#aaa;--card:#222427;--bd:#3a3c40}}
+:root[data-theme="dark"]{--bg:#17181a;--fg:#ececea;--muted:#9a9a94;--line:#aaa;--card:#222427;--bd:#3a3c40}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:1.3rem;margin:0 0 4px}
+p.sub{margin:0 0 14px;color:var(--muted);font-size:.9rem}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font:inherit;font-size:.85rem;padding:6px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
+svg{display:block;width:100%;min-width:720px;height:auto}
+text{fill:var(--fg);font-size:12px;paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px;font-size:.8rem;color:var(--muted)}
+.leg i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:1px solid #0006}
+#tip{position:fixed;pointer-events:none;max-width:300px;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:.8rem;line-height:1.35;box-shadow:0 4px 14px #0003;display:none;z-index:9}
+#tip b{display:block;margin-bottom:2px}#tip span{color:var(--muted)}
+#status{margin-top:10px;font-size:.88rem}
+:root{--bg:#fff;--card:#fff;--fg:#111827;--muted:#5b6472;--line:#4b5563;--bd:#cbd2da;--band:#f4f6f9}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#14171a;--card:#14171a;--fg:#e6e8eb;--muted:#9aa3ad;--line:#aab2bb;--bd:#363c43;--band:#1b1f23}}
+:root[data-theme="dark"]{--bg:#14171a;--card:#14171a;--fg:#e6e8eb;--muted:#9aa3ad;--line:#aab2bb;--bd:#363c43;--band:#1b1f23}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:600;font-size:1.45rem}
+p.sub{font-family:Georgia,"Times New Roman",serif}
+.wrap{border-radius:3px}
+button{border-radius:3px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.78rem}
+text{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px}
+#tip{border-radius:3px;box-shadow:none}
+.cap{font-family:Georgia,"Times New Roman",serif;font-size:.84rem;color:var(--muted);margin:12px 0 0;line-height:1.5}
+:root{--bg:#d9d7d1;--page:#fffefb;--card:#fffefb;--fg:#1a1a1a;--muted:#555;--line:#333;--bd:#1a1a1a;--band:#f5f2ea;--serif:"Latin Modern Roman","LM Roman 10","CMU Serif","STIX Two Text",Georgia,serif;--tt:"Latin Modern Mono","CMU Typewriter Text","Courier New",monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}}
+:root[data-theme="dark"]{--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}
+html,body{font-family:var(--serif)}
+main{background:var(--page);max-width:940px;margin:24px auto;padding:56px 64px 48px;box-shadow:0 2px 18px #0003}
+@media (max-width:700px){main{margin:0;padding:28px 16px}}
+h1.ttl{font-family:var(--serif);font-weight:400;font-size:1.9rem;text-align:center;margin:0 0 .5rem;line-height:1.2}
+p.auth,p.date{text-align:center;margin:0;font-size:1.05rem}
+p.date{color:var(--muted);margin-bottom:1.4rem}
+.abs{margin:0 auto 1.4rem;max-width:34rem;font-size:.92rem;line-height:1.45;text-align:justify}
+.abs b{display:block;text-align:center;font-size:.95rem;margin-bottom:.3rem}
+h2{font-family:var(--serif);font-size:1.2rem;font-weight:700;margin:1.6rem 0 .6rem}
+code{font-family:var(--tt);font-size:.9em}
+.wrap{border:0;background:transparent;border-radius:0}
+button{font-family:var(--serif);font-size:.9rem;border:1px solid var(--fg);border-radius:0;background:transparent}
+button[aria-pressed="true"]{background:var(--fg);color:var(--page)}
+text{font-family:var(--serif);font-style:italic;font-size:13px}
+.leg{font-family:var(--serif);font-size:.85rem}
+.cap{font-family:var(--serif);text-align:justify;font-size:.9rem}
+#status{font-size:.95rem}
+table{border-collapse:collapse;margin:0 auto;font-size:.95rem}
+th,td{padding:5px 16px;text-align:left}
+thead tr{border-top:2px solid var(--fg);border-bottom:1px solid var(--fg)}
+tbody tr:last-child{border-bottom:2px solid var(--fg)}
+th.on,td.on{background:var(--band)}
+#tip{font-family:var(--serif);font-size:.88rem}
+</style>
+</head>
+<body>
+<main>
+<h1 class="ttl">Atomic Structure as a Directed Hypergraph</h1>
+<p class="auth">Evidence graph of <code>Scilib.AtomicStructure</code>, formalized in Lean&nbsp;4</p>
+<p class="date">October 21, 2026</p>
+<div class="abs"><b>Abstract</b>We encode the evidence for three models of the atom as a directed hypergraph, where each hyperedge maps a set of premises to a set of conclusions. A <i>world</i> is a set of theories and probes; the graph then assigns every experiment a verdict of supported, refuted, or silent. Choose a world below, and hover any element for its Lean statement.</div>
+<h2>1&ensp;The evidence graph</h2>
+<div class="bar" id="bar"></div>
+<div class="wrap"><svg id="g" viewBox="0 0 1000 680" role="img" aria-label="Evidence hypergraph"></svg></div>
+<div id="status"></div>
+<p class="cap"><b>Figure 1:</b> Directed hypergraph of the evidence structure. Hollow squares are <i>implies</i> hyperedges (theory → claim); filled squares are <i>interprets</i> hyperedges ({claim, probe} → experiment). Dashed colored lines show each world’s member theories and probes; the red dashed line is a contradiction, which is not a directed edge.</p>
+<h2>2&ensp;Verdicts per world</h2>
+<table id="tab"></table>
+<p class="cap"><b>Table 1:</b> Verdict assigned to each experiment in each world. The currently selected world is shaded.</p>
+<div class="leg" id="leg"></div>
+</main>
+<div id="tip"></div>
+<script>
+const NS="http://www.w3.org/2000/svg";
+// id: [name, kind, x, y, text]
+const N={
+1:["subatomicElectronTheory","theory",0,8,"Cathode rays consist of universal subatomic negatively charged corpuscles (electrons). J.J. Thomson, 1897"],
+2:["thomsonModel","theory",0,6,"Plum pudding: uniform positive sphere with embedded electrons. J.J. Thomson, 1904"],
+3:["rutherfordModel","theory",0,4.5,"Positive charge and nearly all mass in a tiny dense nucleus. Rutherford, 1911"],
+4:["bohrModel","theory",0,1.5,"Electrons occupy discrete stationary states with quantized energy. Bohr, 1913"],
+5:["vacuumCathodeTube","probe",1.6,7.2,"High voltage across a low-pressure gas discharge tube."],
+6:["alphaParticleBeam","probe",1.6,3.7,"Alpha particles used as scattering probes. Geiger & Marsden"],
+7:["mercuryVaporTube","probe",1.6,1.7,"Mercury vapor bombarded with thermionic electrons. Franck & Hertz setup"],
+8:["hydrogenDischargeTube","probe",1.6,-0.2,"Low-pressure hydrogen excited by electrical discharge."],
+9:["universalChargeToMassRatio","claim",1.6,8,"Corpuscles show a constant, high charge-to-mass ratio independent of cathode material."],
+10:["smallAngleScatteringOnly","claim",1.6,6,"Alpha particles pass through the atom with very small deflections."],
+11:["largeAngleBackscattering","claim",1.6,4.5,"Intense Coulomb repulsion from a massive point charge gives wide deflections."],
+12:["discreteEnergyTransfer","claim",1.6,2.4,"Electrons transfer energy to atoms in discrete packets, causing sudden current drops."],
+13:["discreteSpectralLines","claim",1.6,0.6,"Emitted light has discrete frequencies from quantum jumps between levels."],
+14:["jjThomson1897","experiment",3.4,8,"Magnetic and electrostatic deflection of cathode rays. Charge-to-mass ratio thousands of times larger than hydrogen ions. Thomson, 1897"],
+15:["geigerMarsden1909","experiment",3.4,4.5,"Alpha particles on thin metal foils. A significant fraction deflected past 90 degrees. Geiger & Marsden, 1909"],
+16:["franckHertz1914","experiment",3.4,2.4,"Current through mercury vapor drops at regular 4.9 eV intervals. Franck & Hertz, 1914"],
+17:["hydrogenSpectrum1885","experiment",3.4,0.6,"Sharp discrete Balmer lines from excited hydrogen. Balmer, 1885"]};
+const E=[
+[[1],[9],"implies"],[[2],[10],"implies"],[[3],[11],"implies"],[[4],[12],"implies"],[[4],[13],"implies"],
+[[9,5],[14],"interprets","Thomson’s deflection measurements confirm universal subatomic electrons."],
+[[11,6],[15],"interprets","Rutherford scattering explains alpha backscattering."],
+[[12,7],[16],"interprets","Franck-Hertz voltage drops prove atomic energy states are quantized."],
+[[13,8],[17],"interprets","Bohr’s frequency condition explains atomic emission spectra."]];
+const CON=[[10,11]];
+const W={worldThomson:{m:new Set([1,2,5,6]),x:-2.8,y:6.8,c:"#2f4b8f",lbl:"Thomson"},
+worldNuclearBohr:{m:new Set([1,3,4,5,6,7,8]),x:-2.8,y:2,c:"#17707a",lbl:"Nuclear + Bohr"}};
+const VC={supported:"#2e8b6e",refuted:"#d63b2b",silent:"#dcd8cf"};
+const KC={theory:"#8a4fa0",probe:"#ecb94e",claim:"#e0792f",experiment:"#f2efe8"};
+const P=i=>[110+(N[i][2]+2.8)*140+ (N[i][2]>=0?0:0),600-N[i][3]*65];
+const px=(x)=>110+(x+2.8)*125, py=(y)=>610-y*65;
+const pos=i=>[px(N[i][2]),py(N[i][3])];
+const wpos=w=>[px(W[w].x),py(W[w].y)];
+
+function verdict(set){
+ const claims=new Set(),out={};
+ E.forEach(([t,h,k])=>{if(k=="implies"&&t.every(x=>set.has(x)))h.forEach(x=>claims.add(x))});
+ const con=new Set();CON.forEach(([a,b])=>{if(claims.has(a))con.add(b);if(claims.has(b))con.add(a)});
+ E.forEach(([t,h,k])=>{if(k!="interprets")return;
+  const c=t.find(i=>N[i][1]=="claim"),pr=t.filter(i=>N[i][1]=="probe"),ok=pr.every(p=>set.has(p));
+  h.forEach(e=>{out[e]=(con.has(c)&&ok)?"refuted":(claims.has(c)&&ok)?"supported":(out[e]||"silent")})});
+ return {out,claims};
+}
+const V={};for(const w in W)V[w]=verdict(W[w].m);
+
+const svg=document.getElementById("g"),tip=document.getElementById("tip");
+let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647-.5;
+function hand(pts,closed,a,p){
+ const m=pts.length,sub=[];let L=0;
+ for(let i=0;i<(closed?m:m-1);i++){const [x1,y1]=pts[i],[x2,y2]=pts[(i+1)%m],d=Math.hypot(x2-x1,y2-y1),n=Math.max(1,Math.round(d/45));L+=d;
+  for(let j=0;j<n;j++)sub.push([x1+(x2-x1)*j/n,y1+(y2-y1)*j/n,!closed&&i==0&&j==0])}
+ if(!closed)sub.push([pts[m-1][0],pts[m-1][1],true]);
+ const amp=Math.min(1.6,L/70),mk=()=>{let s="";sub.forEach(([x,y,f],i)=>{s+=(i?"L":"M")+(x+(f?0:rnd()*amp)).toFixed(1)+" "+(y+(f?0:rnd()*amp)).toFixed(1)});return s+(closed?"Z":"")};
+ const b={...a};["x","y","width","height","cx","cy","r","x1","y1","x2","y2","rx","pts"].forEach(k=>delete b[k]);
+ const sw=a["stroke-width"]||1;let first=null;
+ if(closed&&a.fill&&a.fill!="none")first=el("path",{...b,d:mk(),stroke:"none"},p);
+ if(a.stroke&&a.stroke!="none"){
+  const e=el("path",{...b,fill:"none",d:mk(),"stroke-linecap":"round","stroke-linejoin":"round","stroke-opacity":.85},p);
+  el("path",{...b,fill:"none",d:mk(),"marker-end":"none","stroke-linecap":"round","stroke-opacity":.45,"stroke-width":sw*.7},p);
+  first=first||e}
+ return first}
+function el(t,a,p){
+ if(t=="line")return hand([[+a.x1,+a.y1],[+a.x2,+a.y2]],false,a,p);
+ if(t=="rect"&&a.width!==undefined){const x=+a.x,y=+a.y,w=+a.width,h=+a.height;return hand([[x,y],[x+w,y],[x+w,y+h],[x,y+h]],true,a,p)}
+ if(t=="circle"){const pts=[];for(let i=0;i<18;i++){const th=i/18*6.2832;pts.push([+a.cx+a.r*Math.cos(th),+a.cy+a.r*Math.sin(th)])}return hand(pts,true,a,p)}
+ if(t=="poly")return hand(a.pts,true,a,p);
+ const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
+const defs=el("defs",{});
+defs.innerHTML='<filter id="grain" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="3" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="3" result="d"/><feColorMatrix in="t" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -2.4 1.3" result="s"/><feComposite in="s" in2="d" operator="in" result="sd"/><feMerge><feMergeNode in="d"/><feMergeNode in="sd"/></feMerge></filter>';
+[["a","var(--line)"],["ab","#2b6cb0"]].forEach(([id,c])=>{
+ const m=el("marker",{id,viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},defs);
+ el("path",{d:"M0 0L10 5L0 10z",fill:c},m)});
+function showTip(ev,h,b){tip.innerHTML="<b>"+h+"</b><span>"+b+"</span>";tip.style.display="block";
+ const w=tip.offsetWidth;tip.style.left=Math.min(ev.clientX+14,innerWidth-w-8)+"px";tip.style.top=(ev.clientY+14)+"px"}
+function hide(){tip.style.display="none"}
+function hover(n,h,b){n.addEventListener("mousemove",e=>showTip(e,h,b));n.addEventListener("mouseleave",hide);
+ n.addEventListener("click",e=>showTip(e,h,b))}
+
+let mode="both";
+function draw(){
+ svg.querySelectorAll(".dyn").forEach(n=>n.remove());sd=7;
+ const g=el("g",{class:"dyn"});
+ [[0,90],[1.6,98],[3.4,80]].forEach(([x,hw])=>el("rect",{x:px(x)-hw,y:44,width:hw*2,height:610,rx:3,fill:"var(--band)"},g));
+ const sel=mode=="both"?null:mode, mem=sel?W[sel].m:null;
+ const dim=i=>sel&&((N[i][1]=="theory"||N[i][1]=="probe")?!mem.has(i):N[i][1]=="claim"?!V[sel].claims.has(i):false);
+ // worlds -> members
+ for(const w in W){const [wx,wy]=wpos(w);const on=!sel||sel==w;
+  W[w].m.forEach(i=>{const [x,y]=pos(i);
+   el("path",{d:`M${wx+60} ${wy}Q${(wx+x)/2} ${(wy+y)/2-14} ${x-14} ${y}`,fill:"none",stroke:W[w].c,"stroke-width":1.1,"stroke-dasharray":"3 3",opacity:on?.6:.1},g)})}
+ // hyperedges
+ E.forEach(([t,h,k,note])=>{
+  const cx=a=>a.reduce((s,i)=>s+pos(i)[0],0)/a.length, cy=a=>a.reduce((s,i)=>s+pos(i)[1],0)/a.length;
+  const hx=(cx(t)+cx(h))/2,hy=(cy(t)+cy(h))/2,col=k=="implies"?"#2b6cb0":"var(--line)";
+  const hot=!sel||t.some(i=>!dim(i))&&t.every(i=>!dim(i));const o=hot?1:.18;
+  t.forEach(i=>{const [x,y]=pos(i);el("line",{x1:x,y1:y,x2:hx,y2:hy,stroke:col,"stroke-width":1.4,opacity:o},g)});
+  h.forEach(i=>{const [x,y]=pos(i),dx=x-hx,dy=y-hy,d=Math.hypot(dx,dy);
+   el("line",{x1:hx,y1:hy,x2:x-dx/d*16,y2:y-dy/d*16,stroke:col,"stroke-width":1.4,opacity:o,"marker-end":`url(#${k=="implies"?"ab":"a"})`},g)});
+  const s=el("rect",{x:hx-4,y:hy-4,width:8,height:8,fill:k=="implies"?"var(--card)":col,stroke:col,"stroke-width":1.5,opacity:o,style:"cursor:help"},g);
+  hover(s,k,note||"Theory implies claim (Edge.implies)")});
+ // contradiction
+ CON.forEach(([a,b])=>{const [x1,y1]=pos(a),[x2,y2]=pos(b);
+  const p=el("path",{d:`M${x1+10} ${y1+14}Q${x1+70} ${(y1+y2)/2} ${x2+10} ${y2-14}`,fill:"none",stroke:"#d62728","stroke-width":1.6,"stroke-dasharray":"5 4",
+   "marker-end":"url(#a)","marker-start":"url(#a)",opacity:sel?(dim(a)&&dim(b)?.2:.9):.9},g);
+  const q=el("path",{d:p.getAttribute("d"),fill:"none",stroke:"transparent","stroke-width":12,style:"cursor:help"},g);
+  hover(q,"contradicts","smallAngleScatteringOnly and largeAngleBackscattering cannot both hold (Edge.contradicts)")});
+ // nodes
+ Object.keys(N).forEach(i=>{const [x,y]=pos(i),[name,kind,,,txt]=N[i],o=dim(i)?.22:1;
+  const grp=el("g",{opacity:o,style:"cursor:help"},g);
+  if(kind!="experiment"){if(kind=="probe"){el("poly",{pts:[[x,y-11],[x+11,y],[x,y+11],[x-11,y]],fill:KC[kind],stroke:"var(--fg)","stroke-width":1},grp)}else if(kind=="claim"){el("rect",{x:x-9,y:y-9,width:18,height:18,rx:3,fill:KC[kind],stroke:"var(--fg)","stroke-width":1},grp)}else{el("circle",{cx:x,cy:y,r:10,fill:KC[kind],stroke:"var(--fg)","stroke-width":1},grp)}}
+  else{
+   if(sel){el("circle",{cx:x,cy:y,r:14,fill:VC[V[sel].out[i]],stroke:"#000","stroke-width":1.2},grp)}
+   else{const r=14,vT=V.worldThomson.out[i],vN=V.worldNuclearBohr.out[i];
+    el("path",{d:`M${x} ${y-r}A${r} ${r} 0 0 0 ${x} ${y+r}Z`,fill:VC[vT],stroke:"#000","stroke-width":1.2},grp);
+    el("path",{d:`M${x} ${y-r}A${r} ${r} 0 0 1 ${x} ${y+r}Z`,fill:VC[vN],stroke:"#000","stroke-width":1.2},grp)}}
+  const t=el("text",{x,y:y-19,"text-anchor":"middle"},grp);t.textContent=name;
+  let extra="";if(kind=="experiment"){const a=V.worldThomson.out[i],b=V.worldNuclearBohr.out[i];
+   extra="<br>worldThomson: <b style='display:inline;color:"+VC[a]+"'>"+a+"</b> · worldNuclearBohr: <b style='display:inline;color:"+VC[b]+"'>"+b+"</b>"}
+  hover(grp,name+" ("+kind+")",txt+extra)});
+ // world hubs
+ for(const w in W){const [x,y]=wpos(w),on=!sel||sel==w;
+  const gr=el("g",{style:"cursor:pointer",opacity:on?1:.45},g);
+  el("rect",{x:x-62,y:y-17,width:124,height:34,rx:10,fill:"var(--card)",stroke:W[w].c,"stroke-width":2.5},gr);
+  const t=el("text",{x,y:y+4,"text-anchor":"middle",style:"font-weight:600;font-size:11.5px;stroke:none"},gr);t.textContent=w;
+  gr.addEventListener("click",()=>setMode(w))}
+ // column heads
+ [[0,"Theories"],[1.6,"Claims & probes"],[3.4,"Experiments"]].forEach(([x,l])=>{
+  const t=el("text",{x:px(x),y:30,"text-anchor":"middle",style:"fill:var(--muted);font-size:12px;letter-spacing:.06em;stroke:none"},g);t.textContent=l.toUpperCase()});
+ status();
+}
+function tab(){const t=document.getElementById("tab"),ex=[14,15,16,17],ws=Object.keys(W),sy={supported:"✓",refuted:"✗",silent:"—"};
+ t.innerHTML="<thead><tr><th>experiment</th>"+ws.map(w=>`<th class="${mode==w?"on":""}">${w}</th>`).join("")+"</tr></thead><tbody>"+ex.map(i=>"<tr><td><i>"+N[i][0]+"</i></td>"+ws.map(w=>{const v=V[w].out[i];return `<td class="${mode==w?"on":""}"><span style="color:${VC[v]};font-weight:700">${sy[v]}</span> ${v}</td>`}).join("")+"</tr>").join("")+"</tbody>"}
+function status(){tab();const s=document.getElementById("status");
+ if(!mode||mode=="both"){s.innerHTML="Experiment circles are split: <b>left half = worldThomson</b>, <b>right half = worldNuclearBohr</b>. Look at geigerMarsden1909: red on the left, green on the right.";return}
+ const o=V[mode].out;s.innerHTML="<b>"+mode+"</b>: "+Object.keys(o).map(i=>N[i][0]+" <b style='color:"+VC[o[i]]+"'>"+o[i]+"</b>").join(" · ")}
+function setMode(m){mode=m;document.querySelectorAll("#bar button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m==m));draw()}
+const bar=document.getElementById("bar");
+[["both","Compare both"],["worldThomson","worldThomson"],["worldNuclearBohr","worldNuclearBohr"]].forEach(([m,l])=>{
+ const b=document.createElement("button");b.textContent=l;b.dataset.m=m;b.setAttribute("aria-pressed",m==mode);b.onclick=()=>setMode(m);bar.appendChild(b)});
+const leg=document.getElementById("leg");
+leg.innerHTML=Object.entries(KC).map(([k,c])=>`<span><i style="background:${c};border-radius:${k=="claim"?"3px":k=="probe"?"0":"50%"};transform:${k=="probe"?"rotate(45deg) scale(.85)":"none"}"></i>${k}</span>`).join("")+
+ Object.entries(VC).map(([k,c])=>`<span><i style="background:${c}"></i>${k}</span>`).join("")+
+ `<span><i style="background:transparent;border:1.5px solid #2b6cb0;border-radius:0"></i>implies hyperedge</span><span><i style="background:#555;border-radius:2px"></i>interprets hyperedge ({claim, probe} → experiment)</span><span style="color:#d62728">- - contradicts</span>`;
+draw();
+</script>
+</body>
+</html>

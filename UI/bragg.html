@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bragg’s law as an evidence graph</title>
+<style>
+:root{--bg:#d9d7d1;--page:#fffefb;--card:#fffefb;--fg:#1a1a1a;--muted:#555;--line:#333;--bd:#1a1a1a;--band:#f5f2ea;
+--serif:Georgia,"Times New Roman","Latin Modern Roman",serif;--tt:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}}
+:root[data-theme="dark"]{--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+main{background:var(--page);max-width:940px;margin:24px auto;padding:56px 64px 48px;box-shadow:0 2px 18px #0003}
+@media (max-width:700px){main{margin:0;padding:28px 16px}}
+h1{font-weight:400;font-size:1.9rem;text-align:center;margin:0 0 .5rem;line-height:1.2}
+p.auth,p.date{text-align:center;margin:0;font-size:1.05rem}p.date{color:var(--muted);margin-bottom:1.4rem}
+.abs{margin:0 auto 1.4rem;max-width:34rem;font-size:.95rem;line-height:1.5;text-align:justify}
+.abs b{display:block;text-align:center;margin-bottom:.3rem}
+h2{font-size:1.2rem;margin:1.8rem 0 .6rem}
+p{line-height:1.55;font-size:1rem}
+code{font-family:var(--tt);font-size:.88em}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font-family:var(--serif);font-size:.92rem;padding:5px 12px;border:1px solid var(--fg);border-radius:0;background:transparent;color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--page)}
+.wrap{overflow-x:auto}
+svg{display:block;width:100%;min-width:800px;height:auto}
+svg text{font-family:var(--serif);font-style:normal;font-size:14.5px;fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+#status{margin-top:10px;font-size:.97rem;line-height:1.5}
+.cap{text-align:justify;font-size:.9rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.86rem;color:var(--muted)}
+.leg i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--fg)}
+table{border-collapse:collapse;margin:0 auto;font-size:.97rem}
+th,td{padding:5px 16px;text-align:left}
+thead tr{border-top:2px solid var(--fg);border-bottom:1px solid var(--fg)}
+tbody tr:last-child{border-bottom:2px solid var(--fg)}
+th.on,td.on{background:var(--band)}
+#tip{position:fixed;pointer-events:none;max-width:320px;background:var(--card);color:var(--fg);border:1px solid var(--bd);padding:8px 10px;font-size:.88rem;line-height:1.35;display:none;z-index:9}
+#tip b{display:block}#tip span{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Bragg’s Law as an Evidence Graph</h1>
+<p class="auth">Evidence graph of <code>Scilib.Bragg</code>, written in Lean&nbsp;4</p>
+<p class="date">October 21, 2026</p>
+<div class="abs"><b>Abstract</b>If the atoms in a crystal sit in neat, evenly spaced planes, X‑rays bounce off those planes and add up only at certain angles. That is Bragg’s law, and it is why a crystal in an X‑ray beam produces sharp spikes instead of a smooth blur. This page draws the argument as a graph: which ideas lead to the prediction, which experiment tests it, and what the evidence says in two different worlds, one where the target is a crystal and one where it has no atomic order. Pick a world below, and hover or tap any item for its full statement.</div>
+
+<h2>1&ensp;The evidence graph</h2>
+<div class="bar" id="bar"></div>
+<div class="wrap"><svg id="g" viewBox="0 0 900 470" role="img" aria-label="Evidence graph of Bragg’s law"></svg></div>
+<div id="status"></div>
+<p class="cap"><b>Figure 1:</b> Read the graph from left to right. Each box on the left is an idea, and each hollow square says “this idea leads to that prediction”. The filled square says “this prediction was tested by that experiment”. The small coloured dots on a box show which worlds include it: blue for the crystal world, teal for the amorphous world. Faded boxes are not part of the world you selected, and a dashed outline means the box is not connected to any arrow. Under the experiment you can read the verdict for each world in words.</p>
+<h2>2&ensp;What each world concludes</h2>
+<table id="tab"></table>
+<p class="cap"><b>Table 1:</b> The verdict for the one experiment in the graph. “Supported” means the world’s ideas lead to the prediction that the experiment tested. “Silent” means they do not, so the experiment says nothing about that world. The selected world is shaded.</p>
+
+<div class="leg" id="leg"></div>
+</main>
+<div id="tip"></div>
+<script>
+var NS="http://www.w3.org/2000/svg";
+// id: [lean name, kind, x, y, label, statement, subline]
+var N={
+1:["crystalLattice","theory",150,90,"Atoms form a lattice","A crystal is a periodic array of atoms or ions forming planes that can scatter radiation. (Crystallography principles)","atoms sit in regular planes"],
+2:["waveNatureOfXRays","theory",150,160,"X‑rays are waves","X‑rays travel as electromagnetic waves with wavelengths comparable to atomic spacing in crystals. (Max von Laue, 1912)","Laue, 1912"],
+3:["braggsLaw","theory",150,230,"Bragg’s law","X‑rays scattered from neighbouring planes reinforce each other when nλ = 2d sin θ. (W. H. and W. L. Bragg, 1913)","nλ = 2d sin θ"],
+4:["randomAmorphousStructure","theory",150,390,"No atomic order","The target lacks long-range periodic atomic order.","no regular planes"],
+5:["monochromaticXRayBeam","probe",450,290,"One-colour X‑ray beam","A collimated X‑ray beam with a single well-defined wavelength. (X‑ray tube apparatus)","a single wavelength"],
+6:["singleCrystalTarget","probe",450,350,"Single crystal","A high-purity single crystal on a goniometer so it can be rotated precisely.","can be rotated precisely"],
+7:["braggPeakPrediction","claim",450,160,"Sharp peaks expected","Monochromatic X‑rays on a crystal give sharp reflection peaks at the angles that satisfy Bragg’s law.","spikes at certain angles"],
+8:["amorphousDiffuseScattering","claim",450,420,"Broad haze expected","Amorphous materials give broad diffuse scattering halos rather than sharp Bragg peaks.","a smooth glow, no spikes"],
+9:["braggSpectrometer1913","experiment",760,160,"1913 rock-salt test","X‑rays aimed at a cleavage face of rock salt, with ionization current measured against angle. Sharp peaks appeared at the angles of the Bragg condition. (W. H. and W. L. Bragg, 1913)","Bragg and Bragg, 1913"]};
+var E=[[[1],[7],"implies","Periodic lattice enables coherent reinforcement."],
+[[2],[7],"implies","Wave interference condition required for Bragg peaks."],
+[[3],[7],"implies","Bragg equation determines peak positions."],
+[[7],[9],"interprets","X‑ray spectrometer peaks confirm the Bragg condition."]];
+var W={worldBraggCrystal:{m:[1,2,3,5,6],c:"#2f4b8f"},worldAmorphous:{m:[4,5],c:"#17707a"}};
+var VC={supported:"#2e8b6e",refuted:"#d63b2b",silent:"#dcd8cf"},KC={theory:"#8a4fa0",probe:"#d9a21b",claim:"#e0792f",experiment:"#555"};
+// same rules as the Lean: derive by entailment, experiment supported if a derived claim is read by it
+function verdict(set){var D={};set.forEach(function(i){D[i]=1});var ch=1;
+ while(ch){ch=0;E.forEach(function(e){if(e[2]=="implies"&&!D[e[1][0]]&&e[0].every(function(x){return D[x]})){D[e[1][0]]=1;ch=1}})}
+ var out={};E.forEach(function(e){if(e[2]=="interprets")out[e[1][0]]=D[e[0][0]]?"supported":"silent"});return{out:out,claims:D}}
+var V={};for(var w in W)V[w]=verdict(W[w].m);
+var svg=document.getElementById("g"),tip=document.getElementById("tip"),mode="both";
+function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
+var defs=el("defs",{});
+[["a","var(--line)"],["ab","#2b6cb0"]].forEach(function(d){var m=el("marker",{id:d[0],viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto"},defs);el("path",{d:"M0 0L10 5L0 10z",fill:d[1]},m)});
+function showTip(ev,h,b){tip.innerHTML="<b>"+h+"</b><span>"+b+"</span>";tip.style.display="block";var w=tip.offsetWidth;tip.style.left=Math.min(ev.clientX+14,innerWidth-w-8)+"px";tip.style.top=(ev.clientY+14)+"px"}
+function hover(n,h,b){n.addEventListener("mousemove",function(e){showTip(e,h,b)});n.addEventListener("mouseleave",function(){tip.style.display="none"});n.addEventListener("click",function(e){showTip(e,h,b)})}
+function draw(){
+ svg.querySelectorAll(".dyn").forEach(function(n){n.remove()});
+ var g=el("g",{"class":"dyn"}),sel=mode=="both"?null:mode,mem=sel?W[sel].m:null,BW=200,BH=52;
+ var dim=function(i){var k=N[i][1];if(!sel)return false;if(k=="theory"||k=="probe")return mem.indexOf(i)<0;if(k=="claim")return !V[sel].claims[i];return false};
+ var inW=function(w,i){var k=N[i][1];return (k=="theory"||k=="probe")?W[w].m.indexOf(i)>=0:k=="claim"?!!V[w].claims[i]:true};
+ [[150,115],[450,115],[760,115]].forEach(function(b){el("rect",{x:b[0]-b[1],y:44,width:b[1]*2,height:400,fill:"var(--band)"},g)});
+ [["Ideas",150],["Predictions and equipment",450],["Experiment",760]].forEach(function(h){var t=el("text",{x:h[1],y:30,"text-anchor":"middle",style:"letter-spacing:.06em;fill:var(--muted);stroke:none;font-size:12.5px"},g);t.textContent=h[0].toUpperCase()});
+ E.forEach(function(e){var t=e[0],h=e[1],k=e[2],t0=N[t[0]],h0=N[h[0]],col=k=="implies"?"#2b6cb0":"var(--line)";
+  var x1=t0[2]+BW/2,x2=h0[2]-BW/2,hx=(x1+x2)/2,hy=(t0[3]+h0[3])/2,o=(!sel||t.every(function(i){return !dim(i)}))?1:.2;
+  el("line",{x1:x1,y1:t0[3],x2:hx,y2:hy,stroke:col,"stroke-width":1.8,opacity:o},g);
+  el("line",{x1:hx,y1:hy,x2:x2-2,y2:h0[3],stroke:col,"stroke-width":1.8,opacity:o,"marker-end":"url(#"+(k=="implies"?"ab":"a")+")"},g);
+  var s=el("rect",{x:hx-6,y:hy-6,width:12,height:12,fill:k=="implies"?"var(--card)":col,stroke:col,"stroke-width":1.8,opacity:o,style:"cursor:help"},g);
+  hover(s,k=="implies"?"leads to":"was tested by",e[3])});
+ Object.keys(N).forEach(function(i){var n=N[i],x=n[2],y=n[3],kind=n[1],o=dim(i)?.28:1;
+  var linked=E.some(function(e){return e[0].indexOf(+i)>=0||e[1].indexOf(+i)>=0});
+  var grp=el("g",{opacity:o,style:"cursor:help"},g);
+  el("rect",{x:x-BW/2,y:y-BH/2,width:BW,height:BH,rx:3,fill:"var(--card)",stroke:"var(--fg)","stroke-width":linked||kind=="experiment"?1.3:1.1,"stroke-dasharray":linked||kind=="experiment"?"none":"5 4"},grp);
+  el("rect",{x:x-BW/2,y:y-BH/2,width:7,height:BH,fill:KC[kind]},grp);
+  var t=el("text",{x:x-BW/2+18,y:y-3,style:"font-weight:600;stroke:none"},grp);t.textContent=n[4];
+  var u=el("text",{x:x-BW/2+18,y:y+15,style:"font-size:12.5px;fill:var(--muted);stroke:none"},grp);u.textContent=n[6];
+  if(!sel&&kind!="experiment"){["worldBraggCrystal","worldAmorphous"].forEach(function(w,j){if(inW(w,+i))el("circle",{cx:x+BW/2-12-j*14,cy:y-BH/2+10,r:4.5,fill:W[w].c},grp)})}
+  var extra="";
+  if(kind=="experiment"){
+   var ws=sel?[sel]:["worldBraggCrystal","worldAmorphous"],sy={supported:"✓",refuted:"✗",silent:"—"},lb={worldBraggCrystal:"Crystal world",worldAmorphous:"Amorphous world"};
+   ws.forEach(function(w,j){var v=V[w].out[i],vt=el("text",{x:x-BW/2,y:y+BH/2+24+j*24,style:"font-weight:600;stroke:none"},g);
+    vt.innerHTML='<tspan style="fill:var(--muted);font-weight:400">'+lb[w]+':</tspan> <tspan style="fill:'+(v=="silent"?"var(--muted)":VC[v])+'">'+sy[v]+" "+v+"</tspan>"});
+   extra="<br>worldBraggCrystal: <b style='display:inline;color:"+VC[V.worldBraggCrystal.out[i]]+"'>"+V.worldBraggCrystal.out[i]+"</b> · worldAmorphous: <b style='display:inline;color:"+VC[V.worldAmorphous.out[i]]+"'>"+V.worldAmorphous.out[i]+"</b>"}
+  if(!linked&&kind!="experiment")extra="<br><i>Not connected to any arrow in the Lean graph.</i>";
+  hover(grp,n[4],n[5]+"<br><code>"+n[0]+"</code>"+extra)});
+ status();
+}
+function tab(){var ws=Object.keys(W),sy={supported:"✓",refuted:"✗",silent:"—"};
+ document.getElementById("tab").innerHTML="<thead><tr><th>experiment</th>"+ws.map(function(w){return '<th class="'+(mode==w?"on":"")+'">'+w+"</th>"}).join("")+"</tr></thead><tbody><tr><td><i>braggSpectrometer1913</i></td>"+ws.map(function(w){var v=V[w].out[9];return '<td class="'+(mode==w?"on":"")+'"><span style="color:'+VC[v]+';font-weight:700">'+sy[v]+"</span> "+v+"</td>"}).join("")+"</tr></tbody>"}
+function status(){tab();var s=document.getElementById("status");
+ if(mode=="both"){s.innerHTML="Under the 1913 test you can read the verdict for each world. The <b>crystal world is supported</b> because its lattice leads to sharp peaks, which is what Bragg measured. The <b>amorphous world is silent</b> because nothing in it leads to that prediction, so the test tells us nothing about it. Pick one world above to focus on it.";return}
+ var v=V[mode].out[9];
+ s.innerHTML=mode=="worldBraggCrystal"?"<b>worldBraggCrystal</b>: the lattice, the wave nature of X‑rays and Bragg’s law all lead to sharp peaks, so the 1913 test is <b style='color:"+VC.supported+"'>supported</b>.":"<b>worldAmorphous</b>: with no atomic order and nothing else granted, no arrow reaches the sharp-peak prediction, so the 1913 test is <b style='color:#777'>silent</b>."}
+function setMode(m){mode=m;document.querySelectorAll("#bar button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m==m)});draw()}
+var bar=document.getElementById("bar");
+[["both","Compare both"],["worldBraggCrystal","worldBraggCrystal"],["worldAmorphous","worldAmorphous"]].forEach(function(p){var b=document.createElement("button");b.textContent=p[1];b.dataset.m=p[0];b.setAttribute("aria-pressed",p[0]==mode);b.onclick=function(){setMode(p[0])};bar.appendChild(b)});
+document.getElementById("leg").innerHTML=Object.keys(KC).map(function(k){return '<span><i style="background:'+KC[k]+'"></i>'+({theory:"idea",probe:"equipment",claim:"prediction",experiment:"experiment"})[k]+"</span>"}).join("")+'<span><i style="background:transparent;border:1.5px solid #2b6cb0"></i>leads to</span><span><i style="background:#555"></i>was tested by</span><span><i style="background:#2f4b8f;border-radius:50%"></i>in crystal world</span><span><i style="background:#17707a;border-radius:50%"></i>in amorphous world</span><span><i style="background:transparent;border:1.5px dashed var(--fg)"></i>not connected</span>';
+draw();
+</script>
+</body>
+</html>

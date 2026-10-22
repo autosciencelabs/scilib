@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Light Diffraction as an Evidence Graph</title>
+<style>
+:root{--bg:#d9d7d1;--page:#fffefb;--card:#fffefb;--fg:#1a1a1a;--muted:#555;--line:#333;--bd:#1a1a1a;--band:#f5f2ea;
+--serif:Georgia,"Times New Roman","Latin Modern Roman",serif;--tt:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}}
+:root[data-theme="dark"]{--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+main{background:var(--page);max-width:1000px;margin:24px auto;padding:56px 56px 48px;box-shadow:0 2px 18px #0003}
+@media (max-width:700px){main{margin:0;padding:28px 16px}}
+h1{font-weight:400;font-size:1.9rem;text-align:center;margin:0 0 .5rem;line-height:1.2}
+p.auth,p.date{text-align:center;margin:0;font-size:1.05rem}p.date{color:var(--muted);margin-bottom:1.4rem}
+.abs{margin:0 auto 1.4rem;max-width:36rem;font-size:.95rem;line-height:1.5;text-align:justify}
+.abs b{display:block;text-align:center;margin-bottom:.3rem}
+h2{font-size:1.2rem;margin:1.8rem 0 .6rem}
+code{font-family:var(--tt);font-size:.88em}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font-family:var(--serif);font-size:.92rem;padding:5px 12px;border:1px solid var(--fg);border-radius:0;background:transparent;color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--page)}
+.wrap{overflow-x:auto}
+svg{display:block;width:100%;min-width:860px;height:auto}
+svg text{font-family:var(--serif);font-style:normal;font-size:14.5px;fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+#status{margin-top:10px;font-size:.97rem;line-height:1.5}
+.cap{text-align:justify;font-size:.9rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.86rem;color:var(--muted)}
+.leg i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--fg)}
+table{border-collapse:collapse;margin:0 auto;font-size:.97rem;width:100%}
+th,td{padding:6px 14px;text-align:left}
+thead tr{border-top:2px solid var(--fg);border-bottom:1px solid var(--fg)}
+tbody tr:last-child{border-bottom:2px solid var(--fg)}
+th.on,td.on{background:var(--band)}
+#tip{position:fixed;pointer-events:none;max-width:340px;background:var(--card);color:var(--fg);border:1px solid var(--bd);padding:8px 10px;font-size:.88rem;line-height:1.35;display:none;z-index:9}
+#tip b{display:block}#tip span{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Light Diffraction as an Evidence Graph</h1>
+<p class="auth">Evidence graph of <code>Scilib.Diffraction</code>, written in Lean&nbsp;4</p>
+<p class="date">October 21, 2026</p>
+<div class="abs"><b>Abstract</b>Light passing around sharp obstacles or through narrow apertures bends and interferes, creating patterns that directly refute classical rectilinear ray models. Explore how wave optics successfully accounts for both single-slit interference and knife-edge fringe spillover test-by-test.</div>
+
+<h2>1&ensp;The evidence graph</h2>
+<div class="bar" id="bar"></div>
+<div class="wrap"><svg id="g" viewBox="0 0 1000 500" role="img" aria-label="Evidence graph of Light Diffraction"></svg></div>
+<div id="status"></div>
+<p class="cap"><b>Figure 1:</b> One row for each experiment. On the left is what geometrical or wave optics predicts. Red dashed lines denote direct contradictions where the prediction and observed result cannot both hold. The experiment is on the right, with verdicts for each theoretical world.</p>
+
+<h2>2&ensp;What each world concludes</h2>
+<table id="tab"></table>
+<p class="cap"><b>Table 1:</b> Verdict for each diffraction experiment across background worlds.</p>
+<div class="leg" id="leg"></div>
+</main>
+<div id="tip"></div>
+<script>
+var NS="http://www.w3.org/2000/svg";
+var N={
+1:["waveTheoryOfLight","theory","Wave theory of light","transverse waves & interference","Light propagates as transverse waves capable of mutual interference and bending around obstacles. (Young, 1801; Fresnel, 1818)"],
+2:["huygensFresnelPrinciple","theory","Huygens-Fresnel principle","secondary spherical wavelets","Every point on a wavefront acts as a source of secondary spherical wavelets."],
+3:["fraunhoferApproximation","theory","Fraunhofer approximation","parallel wavefronts","When source and screen are effectively at infinity, waves are treated as parallel."],
+4:["geometricalOptics","theory","Geometrical optics","strictly rectilinear rays","Light travels strictly in rectilinear rays, ignoring wave interference and diffraction."],
+5:["singleSlitInterferencePattern","claim","Single-slit fringes","central maximum & dark minima","A single slit produces a central bright maximum flanked by alternating dark minima."],
+6:["geometricalShadowPrediction","claim","Sharp shadow prediction","perfectly abrupt boundary","Light passing a sharp edge projects a perfectly abrupt boundary between illumination and shadow."],
+7:["diffractionFringeObservation","claim","Fringe spillover in shadow","fringes spill into shadow","Light passing a sharp edge spills into the shadow region, forming alternating fringes."],
+8:["laserSingleSlit1960","experiment","Laser single-slit test","coherent laser source","Shine a coherent laser through a narrow single slit onto a distant screen and record the intensity profile."],
+9:["fresnelKnifeEdge1818","experiment","Fresnel knife-edge test","point source illumination","Examine the shadow cast by a sharp straight edge illuminated by a point source of light."]
+};
+var E=[
+{t:[1],h:5,k:"implies",n:"Wave theory predicts single slit fringes"},
+{t:[5],h:8,k:"interprets",n:"Laser diffraction profile confirmation"},
+{t:[4],h:6,k:"implies",n:"Rectilinear ray propagation predicts sharp shadow"},
+{t:[6,7],k:"contradicts",n:"Sharp shadow contradicts fringe spillover"},
+{t:[1],h:7,k:"implies",n:"Wave theory accounts for fringe spillover"},
+{t:[7],h:9,k:"interprets",n:"Knife-edge fringe observation"}
+];
+var C=[[6,7]];
+var W={
+  worldGeometricalOptics:{m:[4],c:"#2f4b8f",lb:"Geometrical Optics"},
+  worldWaveOptics:{m:[1,2,3],c:"#17707a",lb:"Wave Optics"}
+};
+var VC={supported:"#2e8b6e",refuted:"#d63b2b",silent:"#dcd8cf"},KC={theory:"#8a4fa0",claim:"#e0792f",experiment:"#555"};
+
+function verdict(set){
+  var D={}; set.forEach(function(i){D[i]=1}); var ch=1;
+  while(ch){
+    ch=0;
+    E.forEach(function(e){
+      if(e.k=="implies" && !D[e.h] && e.t.every(function(x){return D[x]})){ D[e.h]=1; ch=1; }
+    });
+  }
+  var out={};
+  E.forEach(function(e){
+    if(e.k!="interprets") return;
+    var o=e.t[0];
+    var bad=C.some(function(c){return (c[0]==o && D[c[1]])||(c[1]==o && D[c[0]])});
+    out[e.h] = bad ? "refuted" : D[o] ? "supported" : "silent";
+  });
+  return {out:out, claims:D};
+}
+
+var V={}; for(var w in W) V[w]=verdict(W[w].m);
+var svg=document.getElementById("g"), tip=document.getElementById("tip"), mode="both";
+
+function el(t,a,p){var e=document.createElementNS(NS,t); for(var k in a)e.setAttribute(k,a[k]); (p||svg).appendChild(e); return e;}
+var defs=el("defs",{});
+[["a","var(--line)"],["ab","#2b6cb0"],["ac","#d63b2b"]].forEach(function(d){
+  var m=el("marker",{id:d[0],viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},defs);
+  el("path",{d:"M0 0L10 5L0 10z",fill:d[1]},m);
+});
+
+function showTip(ev,h,b){
+  tip.innerHTML="<b>"+h+"</b><span>"+b+"</span>"; tip.style.display="block";
+  var w=tip.offsetWidth; tip.style.left=Math.min(ev.clientX+14, innerWidth-w-8)+"px"; tip.style.top=(ev.clientY+14)+"px";
+}
+function hover(n,h,b){
+  n.addEventListener("mousemove",function(e){showTip(e,h,b)});
+  n.addEventListener("mouseleave",function(){tip.style.display="none"});
+}
+
+var LANES=[
+  ["1  Single-Slit Interference", 180, 5, 0, 8],
+  ["2  Knife-Edge Diffraction", 350, 6, 7, 9]
+];
+var POS={pred:130,obs:400,exp:670}, BW=210, BH=58, RY=75;
+
+function relies(id){
+  var e=E.filter(function(x){return x.h==id && x.k=="implies"})[0];
+  return e ? "<br>Relies on: "+e.t.map(function(t){return N[t][2]}).join(", ") : "";
+}
+
+function draw(){
+  svg.querySelectorAll(".dyn").forEach(function(n){n.remove()});
+  var g=el("g",{"class":"dyn"}), sel=mode=="both"?null:mode, mem=sel?W[sel].m:null;
+  var dim=function(i){var k=N[i][1]; if(!sel) return false; if(k=="theory") return mem.indexOf(i)<0; if(k=="claim") return !V[sel].claims[i]; return false;};
+  var inW=function(w,i){var k=N[i][1]; return k=="theory"?W[w].m.indexOf(i)>=0 : k=="claim"?!!V[w].claims[i] : true;};
+  var wn=Object.keys(W);
+
+  function node(i,x,y){
+    var n=N[i], kind=n[1], grp=el("g",{opacity:dim(i)?.28:1,style:"cursor:help"},g);
+    el("rect",{x:x-BW/2,y:y-BH/2,width:BW,height:BH,rx:3,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},grp);
+    el("rect",{x:x-BW/2,y:y-BH/2,width:7,height:BH,fill:KC[kind]},grp);
+    var t=el("text",{x:x-BW/2+18,y:y-(n[3]?4:-5),style:"font-weight:600;stroke:none"},grp); t.textContent=n[2];
+    if(n[3]){ var u=el("text",{x:x-BW/2+18,y:y+16,style:"font-size:12.5px;fill:var(--muted);stroke:none"},grp); u.textContent=n[3]; }
+    if(!sel && kind!="experiment") wn.forEach(function(w,j){if(inW(w,i)) el("circle",{cx:x+BW/2-12-j*14,cy:y-BH/2+10,r:4.5,fill:W[w].c},grp);});
+    hover(grp,n[2],n[4]+"<br><code>"+n[0]+"</code>"+(kind=="claim"?relies(i):""));
+  }
+
+  function link(x1,y1,x2,y2,col,k,note,dash,both){
+    el("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:col,"stroke-width":1.8,"stroke-dasharray":dash||"none","marker-end":"url(#"+(k=="implies"?"ab":k=="contradicts"?"ac":"a")+")"},g);
+    if(both) g.lastChild.setAttribute("marker-start","url(#ac)");
+    var hx=(x1+x2)/2, hy=(y1+y2)/2, s=el("rect",{x:hx-6,y:hy-6,width:12,height:12,fill:k=="implies"||k=="contradicts"?"var(--card)":col,stroke:col,"stroke-width":1.8,style:"cursor:help"},g);
+    hover(s,k=="implies"?"leads to":k=="contradicts"?"cannot both be true":"was tested by",note);
+  }
+
+  // Header banner
+  el("rect",{x:20,y:40,width:960,height:56,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},g);
+  el("rect",{x:20,y:40,width:7,height:56,fill:KC.theory},g);
+  el("text",{x:42,y:63,style:"font-weight:600;stroke:none"},g).textContent="Core Frameworks";
+  el("text",{x:42,y:83,style:"font-size:13px;fill:var(--muted);stroke:none"},g).textContent="Geometrical ray propagation vs. Wave optics and Huygens-Fresnel wavelets.";
+
+  [["PREDICTION",POS.pred],["OBSERVATION",POS.obs],["EXPERIMENT",POS.exp]].forEach(function(h){
+    var t=el("text",{x:h[1],y:124,"text-anchor":"middle",style:"letter-spacing:.05em;fill:var(--muted);stroke:none;font-size:12px"},g);
+    t.textContent=h[0];
+  });
+
+  var top=135;
+  LANES.forEach(function(L,li){
+    var y=L[1], hasObs=!!L[3], bottom=hasObs?y+RY+45:y+45;
+    if(li%2==0) el("rect",{x:6,y:top,width:988,height:bottom-top,fill:"var(--band)"},g);
+    el("text",{x:20,y:top+17,style:"font-weight:700;stroke:none;font-size:13px;fill:var(--muted)"},g).textContent=L[0];
+
+    var pi=L[2], oi=L[3], ei=L[4];
+    if(!oi){
+      link(POS.pred+BW/2,y,POS.exp-BW/2,y,"var(--line)","interprets",E.filter(function(e){return e.h==ei})[0].n);
+    } else {
+      link(POS.pred+BW/2,y,POS.obs-BW/2,y,"#d63b2b","contradicts",C.filter(function(c){return c[0]==pi})[0]&&"Prediction conflicts with observation.","5 4",1);
+      var ie=E.filter(function(e){return e.h==ei})[0];
+      link(POS.obs+BW/2,y,POS.exp-BW/2,y,"var(--line)","interprets",ie.n);
+      var re=E.filter(function(e){return e.h==oi})[0];
+      link(POS.obs,y+RY-BH/2,POS.obs,y+BH/2+2,"#2b6cb0","implies",re.n);
+      node(oi,POS.obs,y);
+    }
+    node(pi,POS.pred,y);
+    node(ei,POS.exp,y);
+
+    var ws=sel?[sel]:wn, sy={supported:"✓",refuted:"✗",silent:"—"};
+    ws.forEach(function(w,j){
+      var v=V[w].out[ei], vt=el("text",{x:POS.exp+BW/2+14,y:y-8+j*22,style:"font-weight:600;stroke:none;font-size:13.5px"},g);
+      vt.innerHTML='<tspan style="fill:var(--muted);font-weight:400">'+W[w].lb+':</tspan> <tspan style="fill:'+(v=="silent"?"var(--muted)":VC[v])+'">'+sy[v]+" "+v+"</tspan>";
+    });
+    top=bottom;
+  });
+  status();
+}
+
+function tab(){
+  var ws=Object.keys(W), sy={supported:"✓",refuted:"✗",silent:"—"};
+  document.getElementById("tab").innerHTML="<thead><tr><th>Experiment</th>"+ws.map(function(w){return '<th class="'+(mode==w?"on":"")+'">'+w+"</th>"}).join("")+"</tr></thead><tbody>"+
+  [8,9].map(function(id){return "<tr><td><b>"+N[id][2]+"</b></td>"+ws.map(function(w){var v=V[w].out[id];return '<td class="'+(mode==w?"on":"")+'"><span style="color:'+VC[v]+';font-weight:700">'+sy[v]+"</span> "+v+"</td>"}).join("")+"</tr>"}).join("")+"</tbody>";
+}
+
+function status(){
+  tab(); var s=document.getElementById("status");
+  if(mode=="both"){
+    s.innerHTML="Comparison mode: <b>Geometrical Optics</b> successfully handles single-slit peaks via standard frameworks but is <b style='color:"+VC.refuted+"'>refuted</b> on sharp-shadow edge fringe spillover. <b>Wave Optics</b> incorporates wave interference and wavelets, successfully supporting both experiments.";
+    return;
+  }
+  s.innerHTML=mode=="worldGeometricalOptics" ?
+    "<b>Geometrical Optics</b>: Assumes straight-line rays; predicts sharp shadows that are <b style='color:"+VC.refuted+"'>refuted</b> by edge diffraction fringes." :
+    "<b>Wave Optics</b>: Integrates transverse waves and Huygens-Fresnel principles, successfully <b style='color:"+VC.supported+"'>supporting</b> both single-slit and knife-edge diffraction experiments.";
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll("#bar button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m==m)});
+  draw();
+}
+
+var bar=document.getElementById("bar");
+[["both","Compare both"],["worldGeometricalOptics","Geometrical Optics"],["worldWaveOptics","Wave Optics"]].forEach(function(p){
+  var b=document.createElement("button"); b.textContent=p[1]; b.dataset.m=p[0];
+  b.setAttribute("aria-pressed",p[0]==mode); b.onclick=function(){setMode(p[0])};
+  bar.appendChild(b);
+});
+
+document.getElementById("leg").innerHTML=
+  '<span><i style="background:'+KC.theory+'"></i>model</span>'+
+  '<span><i style="background:'+KC.claim+'"></i>prediction or observation</span>'+
+  '<span><i style="background:'+KC.experiment+'"></i>experiment</span>'+
+  '<span><i style="background:transparent;border:1.5px solid #2b6cb0"></i>leads to</span>'+
+  '<span><i style="background:#555"></i>was tested by</span>'+
+  '<span style="color:#d63b2b">- - cannot both be true</span>'+
+  '<span><i style="background:#2f4b8f;border-radius:50%"></i>Geometrical Optics world</span>'+
+  '<span><i style="background:#17707a;border-radius:50%"></i>Wave Optics world</span>';
+
+draw();
+</script>
+</body>
+</html>

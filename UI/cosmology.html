@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cosmology as an evidence graph</title>
+<style>
+:root{--bg:#d9d7d1;--page:#fffefb;--card:#fffefb;--fg:#1a1a1a;--muted:#555;--line:#333;--bd:#1a1a1a;--band:#f5f2ea;
+--serif:Georgia,"Times New Roman","Latin Modern Roman",serif;--tt:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}}
+:root[data-theme="dark"]{--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+main{background:var(--page);max-width:1000px;margin:24px auto;padding:56px 56px 48px;box-shadow:0 2px 18px #0003}
+@media (max-width:700px){main{margin:0;padding:28px 16px}}
+h1{font-weight:400;font-size:1.9rem;text-align:center;margin:0 0 .5rem;line-height:1.2}
+p.auth,p.date{text-align:center;margin:0;font-size:1.05rem}p.date{color:var(--muted);margin-bottom:1.4rem}
+.abs{margin:0 auto 1.4rem;max-width:36rem;font-size:.95rem;line-height:1.5;text-align:justify}
+.abs b{display:block;text-align:center;margin-bottom:.3rem}
+h2{font-size:1.2rem;margin:1.8rem 0 .6rem}
+code{font-family:var(--tt);font-size:.88em}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font-family:var(--serif);font-size:.92rem;padding:5px 12px;border:1px solid var(--fg);border-radius:0;background:transparent;color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--page)}
+.wrap{overflow-x:auto}
+svg{display:block;width:100%;min-width:860px;height:auto}
+svg text{font-family:var(--serif);font-style:normal;font-size:14.5px;fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+#status{margin-top:10px;font-size:.97rem;line-height:1.5}
+.cap{text-align:justify;font-size:.9rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.86rem;color:var(--muted)}
+.leg i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--fg)}
+table{border-collapse:collapse;margin:0 auto;font-size:.97rem;width:100%}
+th,td{padding:6px 14px;text-align:left}
+thead tr{border-top:2px solid var(--fg);border-bottom:1px solid var(--fg)}
+tbody tr:last-child{border-bottom:2px solid var(--fg)}
+th.on,td.on{background:var(--band)}
+#tip{position:fixed;pointer-events:none;max-width:340px;background:var(--card);color:var(--fg);border:1px solid var(--bd);padding:8px 10px;font-size:.88rem;line-height:1.35;display:none;z-index:9}
+#tip b{display:block}#tip span{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Cosmology as an Evidence Graph</h1>
+<p class="auth">Evidence graph of <code>Scilib.Cosmology</code>, written in Lean&nbsp;4</p>
+<p class="date">October 21, 2026</p>
+<div class="abs"><b>Abstract</b>Modern cosmology evolved through two major paradigm shifts: first, from Einstein’s static universe to a dynamic expanding model following Hubble’s redshift law; second, from a matter-dominated decelerating expansion to an accelerating universe driven by dark energy. This page lays out, test by test, how static and decelerating models were refuted by galactic redshifts and Type Ia supernovae, while LambdaCDM remains supported across all probes. Pick a world below, and hover or tap any box for details.</div>
+
+<h2>1&ensp;The evidence graph</h2>
+<div class="bar" id="bar"></div>
+<div class="wrap"><svg id="g" viewBox="0 0 1000 820" role="img" aria-label="Evidence graph of Cosmology"></svg></div>
+<div id="status"></div>
+<p class="cap"><b>Figure 1:</b> One row for each cosmological probe. On the left is what the model predicts. The red dashed line means that prediction and the observation below it cannot both be true. The LambdaCDM prediction underneath explains the observation. The experiment is on the right, with its verdict for each world in words. Small coloured dots on a box show which worlds include it: blue for Static, teal for Decelerating, orange for LambdaCDM. Faded boxes are not part of the world you selected.</p>
+
+<h2>2&ensp;What each world concludes</h2>
+<table id="tab"></table>
+<p class="cap"><b>Table 1:</b> Verdict for each experiment. “Supported” means the world leads to what was observed. “Refuted” means the world predicts something the experiment contradicts. “Silent” means the world says nothing about it. The selected world is shaded.</p>
+<div class="leg" id="leg"></div>
+</main>
+<div id="tip"></div>
+<script>
+var NS="http://www.w3.org/2000/svg";
+var N={
+1:["staticUniverseTheory","theory","Static universe","no overall expansion","The universe is static on large scales, maintained in equilibrium via a static balance of forces. (Einstein, 1917)"],
+2:["standardDeceleratingUniverseTheory","theory","Decelerating model","gravitational slowing","The universe expands from an initial Big Bang, but mutual gravitational attraction steadily decelerates expansion over time."],
+3:["darkEnergyLambdaCDMTheory","theory","LambdaCDM model","dark energy & CDM","The universe is spatially flat and expanding at an accelerating rate driven by a positive cosmological constant Lambda."],
+4:["galacticSpectroscopyProbe","theory","Galactic spectroscopy","Doppler redshift probe","Spectroscopic measurement of stellar and galactic Doppler redshifts across local and cosmological distances."],
+5:["supernovaLuminosityProbe","theory","Supernova photometry","Type Ia standard candles","Photometric light curve and redshift calibration of distant Type Ia supernovae as standard candles."],
+6:["largeScaleStructureProbe","theory","Large scale structure","BAO standard rulers","Mapping galaxy clustering patterns and Baryon Acoustic Oscillation (BAO) standard rulers across cosmic epochs."],
+7:["cmbAnisotropyProbe","theory","CMB anisotropy probe","temperature power spectra","Precision mapping of acoustic peak locations and temperature power spectra in the Cosmic Microwave Background."],
+8:["zeroRecessionPrediction","claim","Zero recession","random peculiar motion","Galaxies exhibit random peculiar motions without any systematic distance-proportional redshift correlation."],
+9:["linearRecessionPrediction","claim","Linear recession","v = H₀ d expansion","Galaxies exhibit a linear velocity-distance relation (v = H₀ d), indicating a dynamic expanding space framework."],
+10:["deceleratingBrightnessPrediction","claim","Deceleration bright","supernovae brighter","Distant Type Ia supernovae should appear systematically brighter because past expansion speeds were higher."],
+11:["acceleratingFaintenessPrediction","claim","Acceleration faintness","supernovae dimmer","Distant Type Ia supernovae must appear fainter than decelerating models predict because space expansion is accelerating."],
+12:["baoAcousticScalePrediction","claim","BAO acoustic scale","flatness & dark energy","Baryon Acoustic Oscillation scales require dark energy to reconcile geometry with flat spatial curvature."],
+13:["cmbFlatnessAndLambdaPrediction","claim","CMB acoustic peaks","Ω_Λ ~ 0.7, Ω_m ~ 0.3","CMB acoustic peaks require a total energy density sum equal to critical density composed of ~70% dark energy and ~30% matter."],
+14:["hubble1929Observation","experiment","Hubble test (1929)","Cepheids & redshifts","Measure distance and radial velocities of nearby galaxies via Cepheid variables; radial velocity is directly proportional to distance. (Hubble, 1929)"],
+15:["supernovae1998Observation","experiment","Supernovae test (1998)","high-z Type Ia light curves","Measure light curves of high-redshift Type Ia supernovae; they are systematically dimmer than predicted by deceleration. (Perlmutter & Riess, 1998)"],
+16:["bao2005Observation","experiment","SDSS BAO test (2005)","galaxy clustering scale","Measure clustering scale of luminous galaxies; BAO correlation peaks provide a standard ruler confirming accelerated expansion. (Eisenstein et al., 2005)"],
+17:["planckCmb2018Observation","experiment","Planck CMB test (2018)","temperature power spectra","Measure angular power spectrum of CMB fluctuations; acoustic peaks prove spatial flatness and confirm Ω_Lambda ~ 0.68. (Planck, 2018)"]
+};
+
+var E=[
+{t:[1],h:8,k:"implies",n:"Static universe predicts zero systematic recession"},
+{t:[8,9],k:"contradicts",n:"Zero recession contradicts linear expansion velocity-distance relation"},
+{t:[2],h:9,k:"implies",n:"Standard decelerating Big Bang predicts linear Hubble expansion"},
+{t:[2],h:10,k:"implies",n:"Decelerating gravity predicts distant supernovae appear brighter"},
+{t:[10,11],k:"contradicts",n:"Deceleration brightness prediction conflicts with accelerating fainteness observation"},
+{t:[3],h:9,k:"implies",n:"LambdaCDM predicts linear Hubble expansion"},
+{t:[3],h:11,k:"implies",n:"Dark energy acceleration predicts distant supernovae appear fainter"},
+{t:[3],h:12,k:"implies",n:"LambdaCDM predicts observed BAO acoustic scale"},
+{t:[3],h:13,k:"implies",n:"LambdaCDM predicts CMB acoustic peak locations"},
+{t:[9,4],h:9,k:"implies",n:"Galactic spectroscopy confirms linear recession"},
+{t:[9],h:14,k:"interprets",n:"Hubble 1929 observation confirms expanding universe"},
+{t:[11,5],h:11,k:"implies",n:"Supernova photometry confirms accelerating fainteness"},
+{t:[11],h:15,k:"interprets",n:"1998 Type Ia supernovae dimming confirms accelerated expansion"},
+{t:[12,6],h:12,k:"implies",n:"Large scale structure survey confirms BAO scale"},
+{t:[12],h:16,k:"interprets",n:"SDSS 2005 BAO measurement confirms cosmic standard ruler"},
+{t:[13,7],h:13,k:"implies",n:"CMB probe confirms acoustic peaks"},
+{t:[13],h:17,k:"interprets",n:"Planck 2018 CMB power spectrum confirms spatial flatness and Lambda"}
+];
+
+var C=[[8,9],[10,11]];
+var W={
+  worldStatic:{m:[1,4,5,6,7],c:"#2f4b8f",lb:"Static universe"},
+  worldDecelerating:{m:[2,4,5,6,7],c:"#17707a",lb:"Decelerating model"},
+  worldLambdaCDM:{m:[3,4,5,6,7],c:"#e0792f",lb:"LambdaCDM model"}
+};
+
+var VC={supported:"#2e8b6e",refuted:"#d63b2b",silent:"#dcd8cf"},KC={theory:"#8a4fa0",claim:"#e0792f",experiment:"#555"};
+
+function verdict(set){
+  var D={};set.forEach(function(i){D[i]=1});var ch=1;
+  while(ch){
+    ch=0;
+    E.forEach(function(e){
+      if(e.k=="implies"&&!D[e.h]&&e.t.every(function(x){return D[x]})){D[e.h]=1;ch=1}
+    });
+  }
+  var out={};
+  E.forEach(function(e){
+    if(e.k!="interprets")return;
+    var o=e.t[0];
+    var bad=C.some(function(c){return (c[0]==o&&D[c[1]])||(c[1]==o&&D[c[0]])});
+    out[e.h]=bad?"refuted":D[o]?"supported":"silent";
+  });
+  return {out:out,claims:D};
+}
+
+var V={};for(var w in W)V[w]=verdict(W[w].m);
+var svg=document.getElementById("g"),tip=document.getElementById("tip"),mode="both";
+
+function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
+var defs=el("defs",{});
+[["a","var(--line)"],["ab","#2b6cb0"],["ac","#d63b2b"]].forEach(function(d){
+  var m=el("marker",{id:d[0],viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},defs);
+  el("path",{d:"M0 0L10 5L0 10z",fill:d[1]},m);
+});
+
+function showTip(ev,h,b){
+  tip.innerHTML="<b>"+h+"</b><span>"+b+"</span>";tip.style.display="block";
+  var w=tip.offsetWidth;tip.style.left=Math.min(ev.clientX+14,innerWidth-w-8)+"px";tip.style.top=(ev.clientY+14)+"px";
+}
+function hover(n,h,b){
+  n.addEventListener("mousemove",function(e){showTip(e,h,b)});
+  n.addEventListener("mouseleave",function(){tip.style.display="none"});
+  n.addEventListener("click",function(e){showTip(e,h,b)});
+}
+
+var LANES=[
+  ["1  Galactic Redshift Expansion", 205, 8, 9, 0, 14],
+  ["2  Supernova Acceleration Luminosity", 350, 10, 11, 0, 15],
+  ["3  Baryon Acoustic Oscillations", 495, 12, 0, 0, 16],
+  ["4  CMB Acoustic Peak Anisotropy", 640, 13, 0, 0, 17]
+];
+var POS={pred:130,obs:400,exp:670},BW=210,BH=58,RY=84;
+
+function relies(id){
+  var e=E.filter(function(x){return x.h==id&&x.k=="implies"})[0];
+  return e?"<br>Relies on: "+e.t.map(function(t){return N[t][2]}).join(", "):"";
+}
+
+function draw(){
+  svg.querySelectorAll(".dyn").forEach(function(n){n.remove()});
+  var g=el("g",{"class":"dyn"}),sel=mode=="both"?null:mode,mem=sel?W[sel].m:null;
+  var dim=function(i){var k=N[i][1];if(!sel)return false;if(k=="theory")return mem.indexOf(i)<0;if(k=="claim")return !V[sel].claims[i];return false};
+  var inW=function(w,i){var k=N[i][1];return k=="theory"?W[w].m.indexOf(i)>=0:k=="claim"?!!V[w].claims[i]:true};
+  var wn=Object.keys(W);
+
+  function node(i,x,y){
+    var n=N[i],kind=n[1],grp=el("g",{opacity:dim(i)?.28:1,style:"cursor:help"},g);
+    el("rect",{x:x-BW/2,y:y-BH/2,width:BW,height:BH,rx:3,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},grp);
+    el("rect",{x:x-BW/2,y:y-BH/2,width:7,height:BH,fill:KC[kind]},grp);
+    var t=el("text",{x:x-BW/2+18,y:y-(n[3]?4:-5),style:"font-weight:600;stroke:none"},grp);t.textContent=n[2];
+    if(n[3]){var u=el("text",{x:x-BW/2+18,y:y+16,style:"font-size:12.5px;fill:var(--muted);stroke:none"},grp);u.textContent=n[3]}
+    if(!sel&&kind!="experiment")wn.forEach(function(w,j){if(inW(w,i))el("circle",{cx:x+BW/2-12-j*14,cy:y-BH/2+10,r:4.5,fill:W[w].c},grp)});
+    hover(grp,n[2],n[4]+"<br><code>"+n[0]+"</code>"+(kind=="claim"?relies(i):""));
+  }
+
+  function link(x1,y1,x2,y2,col,k,note,dash,both){
+    el("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:col,"stroke-width":1.8,"stroke-dasharray":dash||"none","marker-end":"url(#"+(k=="implies"?"ab":k=="contradicts"?"ac":"a")+")"},g);
+    if(both)g.lastChild.setAttribute("marker-start","url(#ac)");
+    var hx=(x1+x2)/2,hy=(y1+y2)/2,s=el("rect",{x:hx-6,y:hy-6,width:12,height:12,fill:k=="implies"?"var(--card)":k=="contradicts"?"var(--card)":col,stroke:col,"stroke-width":1.8,style:"cursor:help"},g);
+    hover(s,k=="implies"?"leads to":k=="contradicts"?"cannot both be true":"was tested by",note);
+  }
+
+  el("rect",{x:20,y:46,width:960,height:62,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},g);
+  el("rect",{x:20,y:46,width:7,height:62,fill:KC.theory},g);
+  var b1=el("text",{x:42,y:72,style:"font-weight:600;stroke:none"},g);b1.textContent="Cosmological Observational Probes";
+  var b2=el("text",{x:42,y:94,style:"font-size:13px;fill:var(--muted);stroke:none"},g);b2.textContent="Testing static, decelerating, and dark-energy models against galactic, supernova, BAO, and CMB data.";
+
+  [["WHAT MODEL PREDICTS",POS.pred],["WHAT WAS OBSERVED",POS.obs],["THE EXPERIMENT",POS.exp]].forEach(function(h){
+    var t=el("text",{x:h[1],y:138,"text-anchor":"middle",style:"letter-spacing:.05em;fill:var(--muted);stroke:none;font-size:12px"},g);
+    t.textContent=h[0];
+  });
+
+  var top=150;
+  LANES.forEach(function(L,li){
+    var y=L[1],pi=L[2],oi=L[3],ei=L[5],bottom=y+75;
+    if(li%2==0)el("rect",{x:6,y:top,width:988,height:125,fill:"var(--band)"},g);
+    var lt=el("text",{x:20,y:top+17,style:"font-weight:700;stroke:none;font-size:13px;fill:var(--muted)"},g);lt.textContent=L[0];
+
+    if(oi){
+      link(POS.pred+BW/2,y,POS.obs-BW/2,y,"#d63b2b","contradicts","Model prediction and observation conflict.","5 4",1);
+      var ie=E.filter(function(e){return e.h==ei})[0];
+      link(POS.obs+BW/2,y,POS.exp-BW/2,y,"var(--line)","interprets",ie.n);
+      node(oi,POS.obs,y);
+    } else {
+      var ie=E.filter(function(e){return e.h==ei})[0];
+      link(POS.pred+BW/2,y,POS.exp-BW/2,y,"var(--line)","interprets",ie?ie.n:"");
+    }
+    node(pi,POS.pred,y);
+    node(ei,POS.exp,y);
+
+    var ws=sel?[sel]:wn,sy={supported:"✓",refuted:"✗",silent:"—"};
+    ws.forEach(function(w,j){
+      var v=V[w].out[ei],vt=el("text",{x:POS.exp+BW/2+14,y:y-8+j*22,style:"font-weight:600;stroke:none;font-size:13.5px"},g);
+      vt.innerHTML='<tspan style="fill:var(--muted);font-weight:400">'+W[w].lb+':</tspan> <tspan style="fill:'+(v=="silent"?"var(--muted)":VC[v])+'">'+sy[v]+" "+v+"</tspan>";
+    });
+    top+=125;
+  });
+  status();
+}
+
+function tab(){
+  var ws=Object.keys(W),sy={supported:"✓",refuted:"✗",silent:"—"};
+  document.getElementById("tab").innerHTML="<thead><tr><th>Experiment</th>"+ws.map(function(w){return '<th class="'+(mode==w?"on":"")+'">'+w+"</th>"}).join("")+"</tr></thead><tbody>"+
+  [14,15,16,17].map(function(id){return "<tr><td><b>"+N[id][2]+"</b></td>"+ws.map(function(w){var v=V[w].out[id];return '<td class="'+(mode==w?"on":"")+'"><span style="color:'+VC[v]+';font-weight:700">'+sy[v]+"</span> "+v+"</td>"}).join("")+"</tr>"}).join("")+"</tbody>";
+}
+
+function status(){
+  tab();var s=document.getElementById("status");
+  if(mode=="both"){
+    s.innerHTML="Compare the verdicts in each row. The <b>Static universe</b> is <b style='color:"+VC.refuted+"'>refuted</b> by Hubble's redshift law. The <b>Decelerating model</b> matches Hubble but is <b style='color:"+VC.refuted+"'>refuted</b> by Type Ia supernovae dimming. The <b>LambdaCDM model</b> incorporates dark energy and is <b style='color:"+VC.supported+"'>supported</b> across all four observational probes.";
+    return;
+  }
+  s.innerHTML=mode=="worldStatic" ?
+    "<b>Static universe</b>: assumes a static universe. Its prediction of zero systematic redshift is <b style='color:"+VC.refuted+"'>refuted</b> by Hubble's 1929 expansion discovery." :
+    mode=="worldDecelerating" ?
+    "<b>Decelerating model</b>: supports Hubble expansion, but its prediction that gravity steadily slows expansion is <b style='color:"+VC.refuted+"'>refuted</b> by 1998 supernova dimming." :
+    "<b>LambdaCDM model</b>: incorporates a positive cosmological constant (dark energy) and cold dark matter, so all four major cosmological experiments are <b style='color:"+VC.supported+"'>supported</b>.";
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll("#bar button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m==m)});
+  draw();
+}
+
+var bar=document.getElementById("bar");
+[["both","Compare all"],["worldStatic","Static universe"],["worldDecelerating","Decelerating model"],["worldLambdaCDM","LambdaCDM model"]].forEach(function(p){
+  var b=document.createElement("button");b.textContent=p[1];b.dataset.m=p[0];
+  b.setAttribute("aria-pressed",p[0]==mode);b.onclick=function(){setMode(p[0])};
+  bar.appendChild(b);
+});
+
+document.getElementById("leg").innerHTML=
+  '<span><i style="background:'+KC.theory+'"></i>model</span>'+
+  '<span><i style="background:'+KC.claim+'"></i>prediction or observation</span>'+
+  '<span><i style="background:'+KC.experiment+'"></i>experiment</span>'+
+  '<span><i style="background:transparent;border:1.5px solid #2b6cb0"></i>leads to</span>'+
+  '<span><i style="background:#555"></i>was tested by</span>'+
+  '<span style="color:#d63b2b">- - cannot both be true</span>'+
+  '<span><i style="background:#2f4b8f;border-radius:50%"></i>Static world</span>'+
+  '<span><i style="background:#17707a;border-radius:50%"></i>Decelerating world</span>'+
+  '<span><i style="background:#e0792f;border-radius:50%"></i>LambdaCDM world</span>';
+
+draw();
+</script>
+</body>
+</html>
