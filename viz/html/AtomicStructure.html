@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Evidence graph</title>
+<style>
+:root{--bg:#d9d7d1;--page:#fffefb;--card:#fffefb;--fg:#1a1a1a;--muted:#555;--line:#333;--bd:#1a1a1a;--band:#f5f2ea;
+--serif:Georgia,"Times New Roman","Latin Modern Roman",serif;--tt:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}}
+:root[data-theme="dark"]{--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+main{background:var(--page);max-width:1000px;margin:24px auto;padding:56px 56px 48px;box-shadow:0 2px 18px #0003}
+@media (max-width:700px){main{margin:0;padding:28px 16px}}
+h1{font-weight:400;font-size:1.9rem;text-align:center;margin:0 0 .5rem;line-height:1.2}
+p.auth,p.date{text-align:center;margin:0;font-size:1.05rem}p.date{color:var(--muted);margin-bottom:1.4rem}
+.abs{margin:0 auto 1.4rem;max-width:36rem;font-size:.95rem;line-height:1.5;text-align:justify}
+.abs b{display:block;text-align:center;margin-bottom:.3rem}
+h2{font-size:1.2rem;margin:1.8rem 0 .6rem}
+code{font-family:var(--tt);font-size:.88em}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font-family:var(--serif);font-size:.92rem;padding:5px 12px;border:1px solid var(--fg);border-radius:0;background:transparent;color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--page)}
+.wrap{overflow-x:auto}
+svg{display:block;width:100%;min-width:860px;height:auto}
+svg text{font-family:var(--serif);font-style:normal;font-size:14.5px;fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+#status{margin-top:10px;font-size:.97rem;line-height:1.5}
+.cap{text-align:justify;font-size:.9rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.86rem;color:var(--muted)}
+.leg i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--fg)}
+table{border-collapse:collapse;margin:0 auto;font-size:.97rem;width:100%}
+th,td{padding:6px 14px;text-align:left}
+thead tr{border-top:2px solid var(--fg);border-bottom:1px solid var(--fg)}
+tbody tr:last-child{border-bottom:2px solid var(--fg)}
+th.on,td.on{background:var(--band)}
+#tip{position:fixed;pointer-events:none;max-width:340px;background:var(--card);color:var(--fg);border:1px solid var(--bd);padding:8px 10px;font-size:.88rem;line-height:1.35;display:none;z-index:9}
+#tip b{display:block}#tip span{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1 id="ttl"></h1>
+<p class="auth">Evidence graph of <code id="ns"></code>, written in Lean&nbsp;4</p>
+<p class="date" id="date"></p>
+<div class="abs"><b>Abstract</b><span id="abs"></span></div>
+
+<h2>1&ensp;The evidence graph</h2>
+<div class="bar" id="bar"></div>
+<div class="wrap"><svg id="g" role="img" aria-label="Evidence graph"></svg></div>
+<div id="status"></div>
+<p class="cap" id="cap1"></p>
+
+<h2>2&ensp;What each world concludes</h2>
+<table id="tab"></table>
+<p class="cap"><b>Table 1:</b> Verdict for each experiment. “Supported” means the world leads to what was observed. “Refuted” means the world leads to something that cannot hold together with what the experiment observed. “Silent” means the world says nothing about it. The selected world is shaded.</p>
+<div class="leg" id="leg"></div>
+</main>
+<div id="tip"></div>
+<script>
+var D={"abstract":"This page lays out the evidence graph of Scilib.AtomicStructure: 4 experiments, 5 derived claims and 4 assumptions or models. 1 pair(s) of statements cannot both be true: “Alpha particles pass through the atom…” against “Alpha particles experience intense Coulomb…”. A world is a set of assumptions granted together. World A supports 3 of 4 experiments, refutes 1 and is silent on 0. It does not grant: Rutherford Nuclear Model. World B supports 4 of 4 experiments, refutes 0 and is silent on 0. It does not grant: Thomson Plum Pudding Model. Hover or tap any box for its full statement.","banner":[],"conflicts":[[2,4]],"date":"October 22, 2026","nodes":[{"id":0,"kind":"claim","label":"Emitted corpuscles exhibit a constant, high…","name":"universalChargeToMassRatio","relies":[1],"stmt":"Emitted corpuscles exhibit a constant, high charge-to-mass ratio independent of cathode material.","sub":""},{"id":1,"kind":"model","label":"Cathode rays consist of universal subatomic…","name":"subatomicElectronTheory","relies":[],"stmt":"Cathode rays consist of universal subatomic negatively charged corpuscles (electrons) emitted by all matter.","sub":"J.J. Thomson, 1897"},{"id":2,"kind":"claim","label":"Alpha particles pass through the atom…","name":"smallAngleScatteringOnly","relies":[3],"stmt":"Alpha particles pass through the atom with very small deflections.","sub":""},{"id":3,"kind":"model","label":"Thomson Plum Pudding Model","name":"thomsonModel","relies":[],"stmt":"Thomson Plum Pudding Model: The atom is a uniform sphere of positive charge with embedded electrons.","sub":"J.J. Thomson, 1904"},{"id":4,"kind":"claim","label":"Alpha particles experience intense Coulomb…","name":"largeAngleBackscattering","relies":[5],"stmt":"Alpha particles experience intense Coulomb repulsion from a massive point charge, resulting in wide deflections.","sub":""},{"id":5,"kind":"model","label":"Rutherford Nuclear Model","name":"rutherfordModel","relies":[],"stmt":"Rutherford Nuclear Model: Positive charge and nearly all mass are concentrated in a tiny, dense central nucleus.","sub":"Ernest Rutherford, 1911"},{"id":6,"kind":"claim","label":"Electrons transfer energy to atoms…","name":"discreteEnergyTransfer","relies":[7],"stmt":"Electrons transfer energy to atoms in strict, discrete packets (excitation potentials), causing sudden drops in current.","sub":""},{"id":7,"kind":"model","label":"Bohr Quantized Model","name":"bohrModel","relies":[],"stmt":"Bohr Quantized Model: Electrons orbit the nucleus only in specific discrete stationary states with quantized energy levels.","sub":"Niels Bohr, 1913"},{"id":8,"kind":"claim","label":"Emitted light consists of discrete…","name":"discreteSpectralLines","relies":[7],"stmt":"Emitted light consists of discrete frequencies corresponding to quantum jumps between energy levels.","sub":""},{"id":9,"kind":"experiment","label":"Measure magnetic and electrostatic…","name":"jjThomson1897","relies":[],"stmt":"Measure magnetic and electrostatic deflection of cathode rays in an evacuated glass tube. Observation: Rays are deflected as negatively charged particles with a charge-to-mass ratio thousands of times larger than hydrogen ions.","sub":"J.J. Thomson, 1897"},{"id":10,"kind":"experiment","label":"Bombard thin metal foils with alpha…","name":"geigerMarsden1909","relies":[],"stmt":"Bombard thin metal foils with alpha particles and count scintillations at wide angles. Observation: Significant fraction of alpha particles deflected past 90 degrees.","sub":"Geiger & Marsden, 1909"},{"id":11,"kind":"experiment","label":"Measure current of electrons passing…","name":"franckHertz1914","relies":[],"stmt":"Measure current of electrons passing through mercury vapor as accelerating voltage is increased in small steps. Observation: Collector current drops sharply at regular 4.9 eV voltage intervals, indicating discrete energy absorption.","sub":"Franck & Hertz, 1914"},{"id":12,"kind":"experiment","label":"Analyze emitted light from excited hydrogen…","name":"hydrogenSpectrum1885","relies":[],"stmt":"Analyze emitted light from excited hydrogen through a diffraction grating spectrometer. Observation: Sharp, discrete spectral lines (Balmer series) appear.","sub":"Johann Balmer, 1885"}],"ns":"Scilib.AtomicStructure","rows":[{"exp":9,"pre":[1],"pred":-1,"reading":0,"title":"J.J. Thomson, 1897","whyConflict":"These two statements cannot both be true.","whyExp":"Thomson's deflection measurements confirm universal subatomic electrons.","whyPre":""},{"exp":10,"pre":[5],"pred":2,"reading":4,"title":"Geiger & Marsden, 1909","whyConflict":"These two statements cannot both be true.","whyExp":"Rutherford scattering explains alpha backscattering.","whyPre":""},{"exp":11,"pre":[7],"pred":-1,"reading":6,"title":"Franck & Hertz, 1914","whyConflict":"These two statements cannot both be true.","whyExp":"Franck-Hertz voltage drops prove atomic energy states are quantized.","whyPre":""},{"exp":12,"pre":[7],"pred":-1,"reading":8,"title":"Johann Balmer, 1885","whyConflict":"These two statements cannot both be true.","whyExp":"Bohr's frequency condition explains atomic emission spectra.","whyPre":""}],"title":"Atomic Structure as an Evidence Graph","worlds":[{"derived":[0,2,6,8],"dropped":[5],"key":"A","label":"Keeps Thomson Plum Pudding Model","members":[1,3,7],"summary":"World A supports 3 of 4 experiments, refutes 1 and is silent on 0. It does not grant: Rutherford Nuclear Model.","verdict":{"10":"refuted","11":"supported","12":"supported","9":"supported"}},{"derived":[0,4,6,8],"dropped":[3],"key":"B","label":"Keeps Rutherford Nuclear Model","members":[1,5,7],"summary":"World B supports 4 of 4 experiments, refutes 0 and is silent on 0. It does not grant: Thomson Plum Pudding Model.","verdict":{"10":"supported","11":"supported","12":"supported","9":"supported"}}]};
+var NS="http://www.w3.org/2000/svg";
+var N=D.nodes,W=D.worlds;
+var KC={model:"#8a4fa0",claim:"#e0792f",experiment:"#555"},VC={supported:"#2e8b6e",refuted:"#d63b2b",silent:"#dcd8cf"};
+var WC=["#2f4b8f","#17707a","#8a6a14","#7a3b6b","#3b7a3f","#7a4b3b"];
+var SY={supported:"✓",refuted:"✗",silent:"—"};
+var svg=document.getElementById("g"),tip=document.getElementById("tip"),mode="all";
+document.title=D.title;document.getElementById("ttl").textContent=D.title;
+document.getElementById("ns").textContent=D.ns;document.getElementById("date").textContent=D.date;
+document.getElementById("abs").textContent=D.abstract;
+W.forEach(function(w){w.mem={};w.members.forEach(function(i){w.mem[i]=1});w.der={};w.derived.forEach(function(i){w.der[i]=1})});
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
+var defs=el("defs",{});
+[["a","var(--line)"],["ab","#2b6cb0"],["ac","#d63b2b"]].forEach(function(d){var m=el("marker",{id:d[0],viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},defs);el("path",{d:"M0 0L10 5L0 10z",fill:d[1]},m)});
+function showTip(ev,h,b){tip.innerHTML="<b>"+esc(h)+"</b><span>"+b+"</span>";tip.style.display="block";var w=tip.offsetWidth;tip.style.left=Math.min(ev.clientX+14,innerWidth-w-8)+"px";tip.style.top=(ev.clientY+14)+"px"}
+function hover(n,h,b){n.addEventListener("mousemove",function(e){showTip(e,h,b)});n.addEventListener("mouseleave",function(){tip.style.display="none"});n.addEventListener("click",function(e){showTip(e,h,b)})}
+function wrap(s,n){var w=s.split(" "),L=[""];w.forEach(function(x){var c=L[L.length-1];if((c+" "+x).trim().length<=n||!c)L[L.length-1]=(c+" "+x).trim();else L.push(x)});
+ if(L.length>2){L=L.slice(0,2);L[1]=L[1].replace(/.{0,2}$/,"")+"…"}return L}
+var BW=210,BH=58,X0=130,X1=400,X2=670,STEP=70;
+function relies(n){return n.relies.length?"<br>Relies on: "+n.relies.map(function(i){return esc(N[i].label)}).join(", "):""}
+function node(g,id,x,y,sel){var n=N[id],grp=el("g",{opacity:dim(id,sel)?.28:1,style:"cursor:help"},g);
+ el("rect",{x:x-BW/2,y:y-BH/2,width:BW,height:BH,rx:3,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},grp);
+ el("rect",{x:x-BW/2,y:y-BH/2,width:7,height:BH,fill:KC[n.kind]},grp);
+ var L=wrap(n.label,26),sub=n.sub.length>30?n.sub.slice(0,29)+"…":n.sub;
+ var y0=L.length==2?(sub?y-14:y-6):(sub?y-4:y+5);
+ L.forEach(function(s,i){var t=el("text",{x:x-BW/2+18,y:y0+i*16,style:"font-weight:600;stroke:none;font-size:13.2px"},grp);t.textContent=s});
+ if(sub){var u=el("text",{x:x-BW/2+18,y:y0+L.length*16,style:"font-size:12.5px;fill:var(--muted);stroke:none"},grp);u.textContent=sub}
+ if(!sel&&n.kind!="experiment")W.forEach(function(w,j){if(inW(w,id))el("circle",{cx:x+BW/2-12-j*14,cy:y-BH/2+10,r:4.5,fill:WC[j%6]},grp)});
+ hover(grp,n.label,esc(n.stmt)+"<br><code>"+esc(n.name)+"</code>"+(n.kind=="claim"?relies(n):""))}
+function inW(w,i){var k=N[i].kind;return k=="experiment"?true:k=="model"?!!w.mem[i]:(!!w.mem[i]||!!w.der[i])}
+function dim(i,sel){return sel?!inW(sel,i):false}
+function link(g,x1,y1,x2,y2,col,k,note,dash,both){
+ var l=el("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:col,"stroke-width":1.8,"stroke-dasharray":dash||"none","marker-end":"url(#"+(k=="leads"?"ab":k=="conflict"?"ac":"a")+")"},g);
+ if(both)l.setAttribute("marker-start","url(#ac)");
+ var hx=(x1+x2)/2,hy=(y1+y2)/2,s=el("rect",{x:hx-6,y:hy-6,width:12,height:12,fill:k=="tested"?col:"var(--card)",stroke:col,"stroke-width":1.8,style:"cursor:help"},g);
+ hover(s,k=="leads"?"leads to":k=="conflict"?"cannot both be true":"was tested by",esc(note||""))}
+function draw(){
+ svg.querySelectorAll(".dyn").forEach(function(n){n.remove()});
+ var g=el("g",{"class":"dyn"}),sel=mode=="all"?null:W.filter(function(w){return w.key==mode})[0];
+ var top=40,anyPred=D.rows.some(function(r){return r.pred>=0});
+ if(D.banner.length){el("rect",{x:20,y:top,width:960,height:62,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},g);el("rect",{x:20,y:top,width:7,height:62,fill:KC.model},g);
+  var b1=el("text",{x:42,y:top+26,style:"font-weight:600;stroke:none"},g);b1.textContent="Where every row starts";
+  var s=D.banner.map(function(i){return N[i].label}).join("; ");if(s.length>120)s=s.slice(0,118)+"…";
+  var b2=el("text",{x:42,y:top+48,style:"font-size:13px;fill:var(--muted);stroke:none"},g);b2.textContent=s;top+=76}
+ [[anyPred?"ASSUMED OR PREDICTED":"ASSUMED",X0],["READ FROM THE DATA",X1],["THE EXPERIMENT",X2]].forEach(function(h){var t=el("text",{x:h[1],y:top+12,"text-anchor":"middle",style:"letter-spacing:.05em;fill:var(--muted);stroke:none;font-size:12px"},g);t.textContent=h[0]});
+ top+=22;
+ D.rows.forEach(function(r,li){var hasPred=r.pred>=0,pre=r.pre,y0=top+56,y,bottom;
+  if(hasPred){y=y0;bottom=y+(pre.length?84+(pre.length-1)*STEP:0)+BH/2+14}
+  else{var k=Math.max(1,pre.length);y=y0+(k-1)*STEP/2;bottom=y0+(k-1)*STEP+BH/2+14}
+  if(li%2==0)el("rect",{x:6,y:top,width:988,height:bottom-top,fill:"var(--band)"},g);
+  var lt=el("text",{x:20,y:top+17,style:"font-weight:700;stroke:none;font-size:13px;fill:var(--muted)"},g);lt.textContent=(li+1)+"  "+r.title;
+  if(hasPred){link(g,X0+BW/2,y,X1-BW/2,y,"#d63b2b","conflict",r.whyConflict,"5 4",1);
+   pre.forEach(function(p,j){var py=y+84+j*STEP;link(g,X1,py-BH/2,X1,(j?py-STEP:y)+BH/2+2,"#2b6cb0","leads",r.whyPre);node(g,p,X1,py,sel)});
+   node(g,r.pred,X0,y,sel)}
+  else pre.forEach(function(p,j){var py=y0+j*STEP;link(g,X0+BW/2,py,X1-BW/2,y,"#2b6cb0","leads",r.whyPre);node(g,p,X0,py,sel)});
+  link(g,X1+BW/2,y,X2-BW/2,y,"var(--line)","tested",r.whyExp);
+  node(g,r.reading,X1,y,sel);node(g,r.exp,X2,y,sel);
+  var ws=sel?[sel]:W;
+  ws.forEach(function(w,j){var v=w.verdict[r.exp],vt=el("text",{x:X2+BW/2+14,y:y-8+j*22,style:"font-weight:600;stroke:none;font-size:13.5px"},g);
+   vt.innerHTML='<tspan style="fill:var(--muted);font-weight:400">'+(W.length>1?"World "+w.key:"Verdict")+':</tspan> <tspan style="fill:'+(v=="silent"?"var(--muted)":VC[v])+'">'+SY[v]+" "+v+"</tspan>"});
+  top=bottom});
+ svg.setAttribute("viewBox","0 0 1000 "+(top+6));
+ status()}
+function tab(){
+ document.getElementById("tab").innerHTML="<thead><tr><th>Experiment</th>"+W.map(function(w){return '<th class="'+(mode==w.key?"on":"")+'">World '+w.key+"</th>"}).join("")+"</tr></thead><tbody>"+
+ D.rows.map(function(r){return "<tr><td><b>"+esc(N[r.exp].label)+"</b></td>"+W.map(function(w){var v=w.verdict[r.exp];return '<td class="'+(mode==w.key?"on":"")+'"><span style="color:'+VC[v]+';font-weight:700">'+SY[v]+"</span> "+v+"</td>"}).join("")+"</tr>"}).join("")+"</tbody>"}
+function status(){tab();var s=document.getElementById("status");
+ if(mode=="all"){s.innerHTML=W.map(function(w){return "<div>"+esc(w.summary)+"</div>"}).join("");return}
+ var w=W.filter(function(x){return x.key==mode})[0];s.innerHTML="<b>World "+w.key+" — "+esc(w.label)+".</b> "+esc(w.summary)}
+function setMode(m){mode=m;document.querySelectorAll("#bar button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m==m)});draw()}
+var bar=document.getElementById("bar"),opts=W.length>1?[["all","Compare all"]]:[];
+W.forEach(function(w){opts.push([w.key,"World "+w.key+" — "+w.label])});
+opts.forEach(function(p){var b=document.createElement("button");b.textContent=p[1];b.dataset.m=p[0];b.setAttribute("aria-pressed",p[0]==mode);b.onclick=function(){setMode(p[0])};bar.appendChild(b)});
+if(W.length==1)mode=W[0].key;
+document.getElementById("cap1").innerHTML="<b>Figure 1:</b> One row for each experiment, "+D.rows.length+" in all. The experiment is on the right and the reading drawn from its data is in the middle. "+(D.conflicts.length?"The red dashed line joins a prediction and a reading that cannot both be true. ":"")+"Blue arrows lead from an assumption or a claim to what it implies. "+(W.length>1?"Small coloured dots on a box show which worlds include it. ":"")+"Faded boxes are not part of the world you selected.";
+document.getElementById("leg").innerHTML='<span><i style="background:'+KC.model+'"></i>assumption or model</span><span><i style="background:'+KC.claim+'"></i>claim, prediction or reading</span><span><i style="background:'+KC.experiment+'"></i>experiment</span><span><i style="background:transparent;border:1.5px solid #2b6cb0"></i>leads to</span><span><i style="background:#555"></i>was tested by</span>'+(D.conflicts.length?'<span style="color:#d63b2b">- - cannot both be true</span>':'')+W.map(function(w,j){return '<span><i style="background:'+WC[j%6]+';border-radius:50%"></i>in world '+w.key+'</span>'}).join("");
+draw();
+</script>
+</body>
+</html>
