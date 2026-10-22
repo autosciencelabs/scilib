@@ -1,22 +1,29 @@
 import Scilib.Basic
+import Scilib.Formalization.BlackbodyRadiation
 
 namespace Scilib.BlackbodyRadiation
+
+open Scilib.Formalization.BlackbodyRadiation
 
 /-! ## Theories & Models -/
 
 def classicalElectrodynamics : Theory where
+  formal := [``ClassicalElectrodynamics, ``classical_to_rayleighJeans]
   statement := "Maxwell's equations and the classical equipartition theorem apply to standing electromagnetic waves in a cavity."
   sources := ["Classical Physics, 19th Century"]
 
 def rayleighJeansLaw : Theory where
+  formal := [``RayleighJeansLaw, ``rayleighJeans_cutoff, ``rayleighJeansLaw_diverges]
   statement := "Rayleigh-Jeans Law: Spectral energy density is proportional to frequency squared, leading to an infinite total energy sum at high frequencies."
   sources := ["Lord Rayleigh, 1900"]
 
 def wiensDistributionLaw : Theory where
+  formal := [``WiensDistributionLaw, ``wienRadiance_pos]
   statement := "Wien's Law: Radiation emission falls off exponentially at high frequencies, successfully fitting short wavelengths but failing in the infrared."
   sources := ["Wilhelm Wien, 1896"]
 
 def planckQuantumHypothesis : Theory where
+  formal := [``PlanckQuantumHypothesis, ``quantum_step, ``quantum_planck_formula]
   statement := "Planck Quantum Hypothesis: Energy is exchanged between matter and radiation only in discrete quanta, yielding a universal distribution law."
   sources := ["Max Planck, 1900"]
 
@@ -24,19 +31,26 @@ def planckQuantumHypothesis : Theory where
 /-! ## Regimes & Auxiliary Assumptions -/
 
 def thermodynamicEquilibrium : Theory where
+  formal := [``ThermodynamicEquilibrium]
   statement := "The cavity radiation is in complete thermal and thermodynamic equilibrium with the cavity walls."
 
 def finiteTotalEnergyObservation : Theory where
+  formal := [``FiniteTotalEnergyObservation]
   statement := "Measured total radiated energy density across all frequencies is strictly finite."
 
 
 /-! ## Derived Claims & Predictions -/
 
 def ultravioletDivergence : Theory :=
-  { statement := "Theoretical energy density diverges to infinity as wavelength approaches zero." }
+  {
+  formal := [``UltravioletDivergence, ``ultraviolet_finite_incompatible]
+  statement := "Theoretical energy density diverges to infinity as wavelength approaches zero." }
 
 def universalBlackbodySpectrum : Theory :=
-  { statement := "A single continuous formula accurately predicts spectral radiance across all infrared, visible, and ultraviolet wavelengths." }
+  {
+  formal := [``UniversalBlackbodySpectrum, ``universal_spectrum_positive, ``planck_continuousOn,
+    ``quantum_to_universal_with_fit, ``planck_density_change_of_variables]
+  statement := "A single continuous formula accurately predicts spectral radiance across all infrared, visible, and ultraviolet wavelengths." }
 
 
 /-! ## Raw Experiments -/
