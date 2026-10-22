@@ -1,3 +1,4 @@
+```mermaid
 graph TD
     subgraph Theories ["Theories & Models"]
         SET["Subatomic Electron Theory (Thomson)"]
@@ -45,3 +46,4 @@ graph TD
     class SET,TM,RM,BM theory;
     class UCTR,SAS,LAB,DET,DSL prediction;
     class JJT,GM,FH,HS experiment;
+```
