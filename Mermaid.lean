@@ -6,6 +6,7 @@ import Scilib.SoapFilm
 import Scilib.Magnus
 import Scilib.Superconductors
 import Scilib.Rainbow
+import Scilib.Bernoulli
 
 open Scilib
 
@@ -111,6 +112,9 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Superconductors" Scilib.Superconductors.evidenceGraph)
   IO.FS.writeFile "viz/rainbow.md"
     (toMarkdown "Rainbow" Scilib.Rainbow.evidenceGraph)
+  IO.FS.writeFile "viz/bernoulli.md"
+    (toMarkdown "Bernoulli's Principle" Scilib.Bernoulli.evidenceGraph)
+  
 
 end Mermaid
 
