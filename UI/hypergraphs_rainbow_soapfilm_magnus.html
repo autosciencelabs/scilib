@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scilib evidence hypergraphs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{--bg:#d9d7d1;--page:#fffefb;--card:#fffefb;--fg:#1a1a1a;--muted:#555;--line:#333;--bd:#1a1a1a;--band:#f5f2ea;
+ --serif:"Latin Modern Roman","LM Roman 10","CMU Serif","STIX Two Text",Georgia,serif;--tt:"Latin Modern Mono","CMU Typewriter Text","Courier New",monospace;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}}
+:root[data-theme="dark"]{--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+main{background:var(--page);max-width:1080px;margin:24px auto;padding:52px 48px 44px;box-shadow:0 2px 18px #0003}
+@media (max-width:700px){main{margin:0;padding:28px 14px}}
+h1{font-weight:400;font-size:1.9rem;text-align:center;margin:0 0 .5rem;line-height:1.2}
+p.auth,p.date{text-align:center;margin:0;font-size:1.05rem}p.date{color:var(--muted);margin-bottom:1.4rem}
+.abs{margin:0 auto 1.4rem;max-width:36rem;font-size:.92rem;line-height:1.45;text-align:justify}
+.abs b{display:block;text-align:center;margin-bottom:.3rem}
+h2{font-size:1.2rem;margin:1.6rem 0 .6rem}
+code{font-family:var(--tt);font-size:.9em}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font-family:var(--serif);font-size:.88rem;padding:5px 11px;border:1px solid var(--fg);border-radius:0;background:transparent;color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--page)}
+.wrap{overflow-x:auto}
+svg{display:block;width:100%;min-width:900px;height:auto}
+text{font-family:var(--serif);font-style:italic;font-size:11.5px;fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+#st{margin-top:10px;font-size:.95rem;line-height:1.5}
+.cap{text-align:justify;font-size:.9rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.85rem;color:var(--muted)}
+.leg i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--fg)}
+#tip{position:fixed;pointer-events:none;max-width:320px;background:var(--card);color:var(--fg);border:1px solid var(--bd);padding:8px 10px;font-size:.86rem;line-height:1.35;display:none;z-index:9}
+#tip b{display:block}#tip span{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<div class="bar" id="tabs"></div>
+<h1 id="ttl"></h1>
+<p class="auth" id="sub"></p>
+<p class="date">October 21, 2026</p>
+<div class="abs" id="abs"></div>
+<h2>1&ensp;The evidence graph</h2>
+<div class="bar" id="bar"></div>
+<div class="wrap"><svg id="g" viewBox="0 0 1160 700" role="img" aria-label="Rainbow evidence hypergraph"></svg></div>
+<div id="st"></div>
+<p class="cap" id="cap"></p>
+<div class="leg" id="leg"></div>
+</main>
+<div id="tip"></div>
+<script>
+const NS="http://www.w3.org/2000/svg";
+const X=[95,300,505,710,915,1070];
+const DS={
+rainbow:{cur:1,v:"raindropModelSupported",cols:["Experiments","Readings & auxiliaries","Laws","Predictions","Corroboration","Verdict & rivals"],
+ ttl:`Why Rainbows Work: an Evidence Hypergraph`,sub:`Evidence graph of <code>Scilib.Rainbow</code>, formalized in Lean&nbsp;4`,abs:`<b>Abstract</b>Nine experiments are read as nine observations, generalized with auxiliary hypotheses into five laws, combined into seven predictions of the raindrop model, and checked against the sky. Two rivals, <i>simpleMirrorModel</i> and <i>pureRayOptics</i>, are refuted. Click any reading or auxiliary to remove it from the granted set and see which conclusions stop following (the Duhem&ndash;Quine effect). Hover anything for its statement.`,cap:`<b>Figure 1:</b> Directed hypergraph of the rainbow argument. Each square is a hyperedge: hollow squares are <i>interprets</i> (experiment &rarr; reading), filled squares are <i>entails</i> (all premises &rarr; conclusion). Faded elements are not derived from the current granted set. Red dashed lines are contradictions; the red square is a nogood set. A red outline marks a conflict, and a red experiment is refuted.`,T:`e1|0|70|reflectionExperiment|Beams on a plane mirror: equal angles for every colour
+e2|0|110|refractionExperiment|Air to water: sine ratio constant at about 1.33
+e3|0|150|prismExperiment|Sunlight spreads into colours; violet deviated most
+e4|0|190|brewsterExperiment|Reflected light polarised; tan θ = n2/n1 at full polarisation
+e5|0|230|youngExperiment|Two slits: fringes, wider for red than violet
+e6|0|270|glassSphereExperiment|Colours from rays reflecting once or twice inside a sphere
+e7|0|310|rainbowSkyExperiment|Bows at 42° and 51°, dark sky between, colours reversed
+e8|0|350|polarisationExperiment|Bow brightness varies strongly with filter angle
+e9|0|390|supernumeraryExperiment|Faint pink and green bands just inside the primary bow
+r1|1|70|reflectionReading|Reflected angle equals incident angle, in the plane
+r2|1|110|refractionReading|sin(incidence)/sin(refraction) = 1.33 for air to water
+r3|1|150|prismReading|Colours refract by different amounts in glass
+r4|1|190|brewsterReading|Reflected light polarised perpendicular to the plane of incidence
+r5|1|230|youngReading|Two close slits give colour-dependent fringes
+r6|1|270|glassSphereReading|Colour comes from one internal reflection (two: reversed set)
+r7|1|310|rainbowSkyReading|Primary at 42° red outside; secondary at 51° red inside
+r8|1|350|polarisationReading|Bow light is polarised tangentially to the arc
+r9|1|390|supernumeraryReading|Faint repeating coloured bands inside the primary bow
+a1|1|454|inductiveGeneralisation|Regularities in careful repeated measurements hold generally
+a2|1|494|dispersionIsGeneral|Colour dependence of refraction in glass also holds in water
+a3|1|534|dropAssumptions|Drops nearly spherical, large versus wavelength, parallel sunlight
+a4|1|574|rayConcentration|Intensity piles up at the minimum deviation angle
+a5|1|614|agreementCriterion|Corroborated when prediction agrees within uncertainty
+a6|1|654|comparativeCriterion|Prefer the model explaining more with fewer assumptions
+l1|2|70|lawOfReflection|Angle of reflection equals angle of incidence, every colour
+l2|2|110|snellsLaw|n1 sin θ1 = n2 sin θ2
+l3|2|150|waterDispersion|In water, violet refracts more than red (1.343 vs 1.331)
+l4|2|190|fresnelBrewster|Reflected light polarised; fully so at tan θB = n2/n1
+l5|2|230|waveInterference|Paths add up: bright and dark fringes by path difference
+p1|3|90|dropRayPaths|Rays leave after one or two internal reflections
+p2|3|145|deviationFormulas|D = 180° + 2i − 4r (primary); 360° + 2i − 6r (secondary)
+p3|3|200|bowAngles|Minimum deviation puts bows near 42° and 51°
+p4|3|255|colourOrders|Primary: red outside; secondary: red inside
+p5|3|310|darkBand|No rays between about 42.4° and 50.4°: Alexander’s dark band
+p6|3|365|polarisationPrediction|Internal angle near Brewster’s: tangential polarisation
+p7|3|420|supernumeraryPrediction|Equal-deviation rays of different path length interfere
+c1|4|120|rayPathsCorroborated|Ray paths agree with the glass sphere experiment
+c2|4|215|bowGeometryCorroborated|Angles, colour order and dark band match the sky
+c3|4|310|polarisationCorroborated|Predicted polarisation matches the filter measurement
+c4|4|405|supernumeraryCorroborated|Predicted bands match the faint inner bands
+v|5|260|raindropModelSupported|One drop model explains four independent kinds of observation
+m1|5|560|simpleMirrorModel|Rival: a bow is a mirror-like reflection, no refraction
+m2|5|620|pureRayOptics|Rival: only non-interfering rays, so no fringes`,
+ E:(()=>{const E=[
+["e",["r1","a1"],"l1","Generalised to all smooth surfaces and colours."],
+["e",["r2","a1"],"l2","Constant sine ratio becomes the law of refraction."],
+["e",["r3","a2","a1"],"l3","Colour-dependent refraction in glass carried over to water."],
+["e",["r4","a1"],"l4","Polarisation rule generalised to all transparent boundaries."],
+["e",["r5","a1"],"l5","Fringe pattern generalised to wave interference."],
+["e",["l1","l2","a3"],"p1","Reflection and refraction at a sphere give the exit paths."],
+["e",["p1","l1","l2"],"p2","Adding the bends at each surface gives the deviation."],
+["e",["p2","a4","r2"],"p3","Minimising deviation with n = 1.33 gives the bow angles."],
+["e",["p3","l3"],"p4","A colour-dependent index moves each colour’s minimum."],
+["e",["p2","p4"],"p5","Minimum deviation stops primary rays and starts secondary ones."],
+["e",["l4","p1","p3"],"p6","Internal reflection angle sits near Brewster’s angle."],
+["e",["p2","p3","l5"],"p7","Two rays, same deviation, different path length interfere."],
+["e",["p1","r6","a5"],"c1","Predicted ray paths match the sphere experiment."],
+["e",["p3","p4","p5","r7","a5"],"c2","Angles, colour order and dark band match the sky."],
+["e",["p6","r8","a5"],"c3","Predicted polarisation matches the filter."],
+["e",["p7","r9","a5"],"c4","Predicted bands match the faint inner bands."],
+["e",["c1","c2","c3","c4","a6"],"v","One drop model accounts for four independent observations."],
+["n",["m1","l1","r7"],null,"A pure reflection is colour-blind, yet the bow shows ordered colours."],
+["c",["m2"],"r9","Non-interfering rays give no extra bands inside the bow."],
+["c",["m2"],"l5","Pure rays and interference of light cannot both hold."],
+["c",["m1"],"v","Mirror reflection and the raindrop model cannot both explain the bow."]];for(let i=1;i<=9;i++)E.unshift(["i",["e"+i],"r"+i,"The raw record is read as this observation."]);return E})(),
+ RD:Object.fromEntries([1,2,3,4,5,6,7,8,9].map(i=>["e"+i,["r"+i]])),
+ pre:()=>{const F=["r1","r2","r3","r4","r5","a1","a2"],CB=F.concat(["a3","a4","r6","r7","r8","r9","a5","a6"]);const PRE=[["foundationEvidence",F],["combinedEvidence",CB],["combined + pureRayOptics",CB.concat("m2")],["combined + simpleMirrorModel",CB.concat("m1")],["combined − comparativeCriterion",CB.filter(x=>x!="a6")]];return [PRE,CB]}},
+magnus:{cur:5,v:"magnusBeatsRivals",cols:["Experiments","Readings & auxiliaries","Laws","Mechanism","Force & predictions","Verdict & rivals"],
+ ttl:`Why the Magnus Effect Works: an Evidence Hypergraph`,sub:`Evidence graph of <code>Scilib.Magnus</code>, formalized in Lean&nbsp;4`,abs:`<b>Abstract</b>Six experiments (tennis and musket balls, Magnus’s cylinder, pressure taps, a wind tunnel, a rotor ship) are read as six observations and combined with twelve laws and auxiliaries into one circulation model. Three independent routes (pressure, circulation, momentum) reach the same sideways force. Three rivals, <i>spinIrrelevantModel</i>, <i>noCirculationFlow</i> and <i>idealLiftIsExact</i>, are refuted. Click any reading, law or auxiliary to remove it from the granted set and see which conclusions stop following (the Duhem&ndash;Quine effect). Hover anything for its statement.`,cap:`<b>Figure 1:</b> Directed hypergraph of the Magnus argument. Each square is a hyperedge: hollow squares are <i>interprets</i> (experiment &rarr; reading), filled squares are <i>entails</i> (all premises &rarr; conclusion). Faded elements are not derived from the current granted set. Red dashed lines are contradictions. A red outline marks a conflict, and a red experiment is refuted.`,T:`e1|0|70|tennisBallExperiment|Spun tennis balls: topspin dips, backspin floats, sidespin drifts
+e2|0|125|musketBallExperiment|Musket balls land well off the aim line, side set by the barrel
+e3|0|180|magnusCylinderExperiment|Spinning brass cylinder in an air blast: frame swings sideways
+e4|0|235|surfacePressureExperiment|Pressure taps: lower on the side moving with the stream
+e5|0|298|windTunnelLiftExperiment|Force coefficient rises with spin ratio, then levels off
+e6|0|370|flettnerRotorShipExperiment|Spinning cylinders drive a ship across the wind; reversing spin reverses it
+r1|1|97|spinDeflectsBallReading|Flight path departs from an unspun ball, direction set by spin sense
+r2|1|180|sidewaysForceReading|Push perpendicular to flow and axis; reverses with the spin
+r3|1|235|surfacePressureReading|Lower pressure on the side moving with the oncoming stream
+r4|1|275|liftRisesWithSpinReading|Force grows with surface speed relative to stream speed
+r5|1|320|liftFlattensBelowIdealReading|At high spin ratio lift levels off below the ideal 2πS
+r6|1|370|rotorShipThrustReading|Vertical spinning cylinders give thrust across the wind
+a1|1|450|attachedBoundaryLayer|Boundary layer stays attached long enough to carry the spin outward
+a2|1|492|outerFlowIdeal|Outside the boundary layer: steady, inviscid, incompressible
+a3|1|534|ballForceBalance|Short flight: constant mass; gravity, drag and spin force
+a4|1|576|verticalRotorsInCrosswind|Ship cylinders spin about vertical axes in a steady horizontal wind
+a5|1|618|separationLimitsLift|Separation and end effects cut real lift below the ideal value
+a6|1|660|explanatoryCriterion|Prefer the model that explains independent data without contradiction
+a7|2|70|noSlipCondition|Fluid touching a surface moves with that surface
+a8|2|135|bernoulliPrinciple|Steady inviscid flow: faster means lower pressure
+a9|2|200|kuttaJoukowski|Force per unit length L′ = ρUΓ, perpendicular to the stream
+a10|2|265|surfaceSpeedIsOmegaR|A surface point of a spinning cylinder moves at ωR
+a11|2|330|newtonSecondLaw|Net force equals rate of change of momentum
+a12|2|395|newtonThirdLaw|The fluid pushes back on the body equally and oppositely
+p1|3|80|circulationAroundSpinner|A spinning body drags fluid round and sets up circulation Γ
+p2|3|150|speedAsymmetry|Flow is faster where the surface moves with the stream
+p3|3|220|lowerPressureOnFastSide|Lower pressure on the faster-flow side
+p4|3|290|pressureForceTowardFastSide|Net pressure force points to the faster-flow side
+p5|3|360|streamDeflection|Circulation turns the stream to one side
+p6|3|430|rigidRotationCirculation|Γ = 2πωR² for a cylinder of radius R spinning at ω
+p7|4|110|idealMagnusLift|L′ = 2πρUωR², so C_L = 2πS with S = ωR/U
+p8|4|230|magnusForce|Force perpendicular to stream and axis, toward the side moving with the stream
+p9|4|350|curvedFlightPrediction|Spun balls follow curved paths
+p10|4|450|flettnerThrust|Vertical spun cylinders push a ship across the wind
+p11|4|570|magnusEffectModel|Circulation, sideways force, ideal limit and its high-spin correction
+v|5|260|magnusBeatsRivals|The circulation model is better supported than its rivals
+m1|5|500|spinIrrelevantModel|Rival: spin has no effect on a ball’s path
+m2|5|570|noCirculationFlow|Rival: no circulation, no sideways force (d’Alembert)
+m3|5|640|idealLiftIsExact|Rival: ideal lift holds exactly at every spin ratio`,
+ E:[
+["i",["e1"],"r1","Topspin, backspin and sidespin paths are read as spin-dependent curved flight."],
+["i",["e2"],"r1","Lateral miss distances are read as a spin-dependent deflection."],
+["i",["e3"],"r2","The swing of the frame is read as a sideways force on the cylinder."],
+["i",["e4"],"r3","The tap readings are read as a pressure asymmetry."],
+["i",["e5"],"r4","The rising force coefficient is read as lift growing with spin ratio."],
+["i",["e5"],"r5","The levelling-off is read as saturation below the ideal value."],
+["i",["e6"],"r6","The ship’s motion is read as thrust from the spinning cylinders."],
+["e",["a7","a1"],"p1","The no-slip surface drags fluid round, so spin becomes circulation in the outer flow."],
+["e",["p1"],"p2","Circulation speeds the flow on one side and slows it on the other."],
+["e",["p2","a8","a2"],"p3","Bernoulli turns the speed difference into a pressure difference."],
+["e",["p3"],"p4","Integrating pressure over the surface gives a net force toward the low-pressure side."],
+["e",["p4"],"p8","Route 1 (pressure): the pressure force is the Magnus force."],
+["e",["a9","p1","a2"],"p8","Route 2 (circulation): L′ = ρUΓ is perpendicular to the stream."],
+["e",["p1"],"p5","Circulation bends the streamlines, turning the stream."],
+["e",["p5","a11","a12"],"p8","Route 3 (momentum): turning the stream pushes the body the other way."],
+["e",["p1","a10"],"p6","Surface speed ωR around the circumference 2πR gives Γ = 2πωR²."],
+["e",["a9","p6","a2"],"p7","Substituting Γ = 2πωR² into L′ = ρUΓ gives L′ = 2πρUωR²."],
+["e",["p7"],"r4","The ideal law predicts lift growing linearly with spin ratio."],
+["e",["a5"],"r5","Separation and end effects predict lift saturating below the ideal value."],
+["e",["p3"],"r3","The pressure asymmetry is exactly what the taps measure."],
+["e",["p8"],"r2","A force toward the side moving with the stream reverses with the spin."],
+["e",["p8","a11","a3"],"p9","Adding the Magnus force to the force balance bends the trajectory."],
+["e",["p9"],"r1","Curved flight is what the tennis and musket observations record."],
+["e",["p8","a4"],"p10","A force perpendicular to wind and vertical axis is horizontal thrust across the wind."],
+["e",["p10"],"r6","The predicted thrust is what the rotor ship shows."],
+["e",["p1","p8","p7","a5"],"p11","Circulation, the force, the ideal limit and its correction together form the model."],
+["e",["p11","r1","r2","r3","r6","r4","a6"],"v","The model accounts for evidence from balls, cylinders, taps, a wind tunnel and a ship."],
+["c",["m1"],"r1","Spin cannot be irrelevant if spun balls leave the unspun path."],
+["c",["m1"],"p11","The model says spin produces a force; the rival says it does not."],
+["c",["m2"],"r2","With no circulation there is no sideways force, yet one is measured."],
+["c",["m2"],"p1","Zero and non-zero circulation cannot both hold."],
+["c",["m3"],"r5","An exact ideal law cannot also level off below its own value."]],RD:{e1:["r1"],e2:["r1"],e3:["r2"],e4:["r3"],e5:["r4","r5"],e6:["r6"]},
+ pre:()=>{const PH=["a7","a1","a8","a2","a9","a10","a11","a12","a3","a4","a5"],CB=PH.concat(["r1","r2","r3","r6","r4","a6"]);const PRE=[["pressure route",["a7","a1","a8","a2"]],["circulation route",["a7","a1","a9","a2"]],["momentum route",["a7","a1","a11","a12"]],["lift formula",["a7","a1","a10","a9","a2"]],["all physics",PH],["combined evidence",CB],["combined + spinIrrelevantModel",CB.concat("m1")],["combined + noCirculationFlow",CB.concat("m2")],["combined + idealLiftIsExact",CB.concat("m3")]];return [PRE,CB]}}
+,soap:{cur:0,v:"unifiedThinFilmTheory",cols:["Experiments","Readings & set-ups","Laws","Derived laws","Unification","Rivals"],
+ ttl:`Why Soap Films Show Colours: an Evidence Hypergraph`,sub:`Evidence graph of <code>Scilib.SoapFilm</code>, formalized in Lean&nbsp;4`,
+ abs:`<b>Abstract</b>Seven experiments (films in white and single-wavelength light, the black film, viewing angle, Newton’s rings, transmission, Lloyd’s mirror) are read as seven observations. Twelve granted laws and set-ups give two derived interference conditions and one unified theory. Young’s inference also runs the other way, from the dark centre to the half-cycle phase rule. Two rivals, <i>pigmentModel</i> and <i>noPhaseShiftModel</i>, are refuted. Click any reading, law or set-up to remove it from the granted set and see which conclusions stop following (the Duhem&ndash;Quine effect). Hover anything for its statement.`,
+ cap:`<b>Figure 1:</b> Directed hypergraph of the thin-film argument. Each square is a hyperedge: hollow squares are <i>interprets</i> (experiment &rarr; reading), filled squares are <i>entails</i> (all premises &rarr; conclusion). Faded elements are not derived from the current granted set. Red dashed lines are contradictions; red squares are nogood sets. A red outline marks a conflict, and a red experiment is refuted.`,
+ T:`e1|0|70|whiteLightFilmExperiment|White light on a vertical soap film: colour bands down the film
+e2|0|115|monochromaticFilmExperiment|Single-wavelength light on the film: periodic bright and dark bands
+e3|0|160|blackFilmExperiment|Film just before it bursts: the thinnest part looks black
+e4|0|205|viewingAngleExperiment|Same film region viewed from different angles
+e5|0|250|newtonRingsExperiment|Lens on a flat plate: concentric rings around a dark centre
+e6|0|295|transmissionExperiment|Colours seen in transmission against reflection at the same spots
+e7|0|340|lloydMirrorExperiment|Lloyd’s mirror: fringes with a dark fringe at the mirror’s edge
+r1|1|70|colourVsThicknessReading|Reflected colour depends on thickness and repeats in a fixed sequence
+r2|1|115|periodicBrightnessReading|One wavelength: brightness alternates periodically with thickness
+r3|1|160|blackFilmReading|The thinnest part of the film reflects almost no light
+r4|1|205|obliqueShiftReading|Larger viewing angle shifts a region’s colour to shorter wavelengths
+r5|1|250|darkCentreReading|Zero-thickness gap reflects almost nothing; rings alternate around it
+r6|1|295|complementaryReading|Transmitted colour is complementary to reflected colour
+r7|1|340|lloydDarkEdgeReading|The fringe at the mirror edge, with equal paths, is dark
+a8|1|410|soapFilmSetup|Soap film (n ≈ 1.33) bounded on both sides by air
+a9|1|452|airGapSetup|Thin air gap between a glass lens and a flat glass plate
+a10|1|494|lloydSetup|Slit source lights the screen directly and by grazing reflection
+a11|1|536|drainageWedge|Gravity drains a vertical film: thicker toward the bottom
+a12|1|578|topIsThin|Top of the film is far thinner than a wavelength before it bursts
+a13|1|620|absorptionIsMonotonic|Uniform pigment dims light steadily with path, never periodically
+a1|2|70|waveSuperposition|Coherent waves add in amplitude; half a cycle apart they cancel
+a2|2|130|snellLaw|n₁ sin θ₁ = n₂ sin θ₂
+a3|2|190|wavelengthInMedium|Wavelength in a medium is λ₀ / n
+a4|2|250|reflectionPhaseRule|Reflection from higher index shifts phase by half a cycle; lower does not
+a5|2|310|energyConservation|Reflected plus transmitted intensity equals incident, per wavelength
+a6|2|370|whiteLightIsMixture|White light is a mixture; each wavelength interferes independently
+a7|2|430|filmGeometry|Two nearly parallel interfaces; one reflection from each recombines
+l1|3|90|opticalPathDifference|Back ray travels an extra optical path 2 n t cos θₜ
+l2|3|190|relativePhaseSoap|Soap film in air: the two reflections differ by an extra half cycle
+l3|3|280|relativePhaseAirGap|Air gap between glass: the two reflections differ by a half cycle
+l4|3|390|thinFilmCondition|Strongest reflection at 2 n t cos θₜ = (m + ½) λ₀, weakest at m λ₀
+l5|3|480|airGapCondition|Air gap reflects least when 2 t = m λ, so the centre is dark
+v|4|300|unifiedThinFilmTheory|Superposition plus one half-cycle rule covers films, rings and Lloyd’s mirror
+m1|5|480|pigmentModel|Rival: the colours come from a pigment in the soap solution
+m2|5|560|noPhaseShiftModel|Rival: reflection never changes phase`,
+ E:[
+["i",["e1"],"r1","Colour varies down the film, where thickness varies, so colour is read as a function of thickness."],
+["i",["e2"],"r2","With one wavelength only brightness can vary, and it does so periodically."],
+["i",["e3"],"r3","The darkest region is the thinnest one, just before rupture."],
+["i",["e4"],"r4","Same film region, different angle: the colour change is read as angle dependence."],
+["i",["e5"],"r5","The central spot is where the gap thickness is zero."],
+["i",["e6"],"r6","Reflected and transmitted colours are compared at the same spots."],
+["i",["e7"],"r7","The screen position with equal path lengths is the mirror’s edge."],
+["e",["a2","a7"],"l1","Ray geometry, with the refraction angle from Snell’s law, gives 2 n t cos θₜ."],
+["e",["a4","a8"],"l2","Air → film is a higher-index reflection, film → air a lower-index one."],
+["e",["a4","a9"],"l3","Glass → air is a lower-index reflection, air → glass a higher-index one."],
+["e",["a1","l1","a3","l2"],"l4","Phase difference is path in wavelengths plus half a cycle; reinforce or cancel by superposition."],
+["e",["a1","l1","l3"],"l5","Same argument with n = 1 and the half-cycle shift on the back reflection."],
+["e",["l4","a6","a11"],"r1","Each thickness reinforces some wavelengths and cancels others; drainage makes bands."],
+["e",["l4","a11"],"r2","Brightness repeats each time t changes by λ₀ / (2n cos θₜ)."],
+["e",["l4","a12"],"r3","As t → 0 only the half-cycle shift remains: total cancellation."],
+["e",["l4"],"r4","Larger angle means smaller cos θₜ, so the condition is met at a shorter wavelength."],
+["e",["l5"],"r5","At t = 0 the minimum-reflection condition holds for every wavelength."],
+["e",["l4","a5"],"r6","Wavelengths missing from reflection must appear in transmission."],
+["e",["a1","a4","a10"],"r7","Equal paths, but the reflected ray gets a half-cycle shift, so it cancels the direct ray."],
+["e",["r5","a1","l1"],"l3","Young: zero path difference yet darkness means an extra half-cycle difference."],
+["e",["r3","a12","a1","l1"],"l2","A film far thinner than λ reflects almost nothing, so the reflections differ by a half cycle."],
+["e",["l4","l5","a4","r7"],"v","One phase rule and one superposition principle cover films, rings and Lloyd’s mirror."],
+["n",["m1","a13","r2"],null,"Pigment absorption is monotonic in thickness, but the observed brightness is periodic."],
+["n",["m2","a1","l1","a12","r3"],null,"With no phase shift the thinnest film would be bright, but it is observed black."],
+["c",["m2"],"l2","The rival denies exactly the half-cycle shift the soap-film condition needs."]],
+ RD:{e1:["r1"],e2:["r2"],e3:["r3"],e4:["r4"],e5:["r5"],e6:["r6"],e7:["r7"]},
+ pre:()=>{const A=["a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12"];return [[["interference laws",A],["drop reflectionPhaseRule",A.filter(x=>x!="a4")],["Young: dark centre gives the phase rule",["r5","a1","a2","a7"]],["+ pigmentModel",A.concat(["a13","m1"])],["+ noPhaseShiftModel",A.concat("m2")]],A]}}};
+const kind=k=>k[0]=="e"?"exp":k[0]=="a"?"aux":k[0]=="m"?"riv":k[0]=="r"?"rd":k=="v"?"ver":"thm";
+const KC={rd:"#8a4fa0",aux:"#ecb94e",thm:"#e0792f",ver:"#e8b24f",riv:"#9b4a4a",exp:"#f2efe8"};
+const VC={supported:"#2e8b6e",refuted:"#d63b2b",silent:"#dcd8cf"};
+let D,P,NM,E,RD,OFF,PRE,G,cur,COLS;
+const svg=document.getElementById("g"),tip=document.getElementById("tip");
+let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647-.5;
+function hand(pts,closed,a,p){
+ const m=pts.length,sub=[];let L=0;
+ for(let i=0;i<(closed?m:m-1);i++){const [x1,y1]=pts[i],[x2,y2]=pts[(i+1)%m],d=Math.hypot(x2-x1,y2-y1),n=Math.max(1,Math.round(d/45));L+=d;
+  for(let j=0;j<n;j++)sub.push([x1+(x2-x1)*j/n,y1+(y2-y1)*j/n,!closed&&i==0&&j==0])}
+ if(!closed)sub.push([pts[m-1][0],pts[m-1][1],true]);
+ const amp=Math.min(1.6,L/70),mk=()=>{let s="";sub.forEach(([x,y,f],i)=>{s+=(i?"L":"M")+(x+(f?0:rnd()*amp)).toFixed(1)+" "+(y+(f?0:rnd()*amp)).toFixed(1)});return s+(closed?"Z":"")};
+ const b={...a};["x","y","width","height","cx","cy","r","x1","y1","x2","y2","rx","pts"].forEach(k=>delete b[k]);
+ const sw=a["stroke-width"]||1;let first=null;
+ if(closed&&a.fill&&a.fill!="none")first=el("path",{...b,d:mk(),stroke:"none"},p);
+ if(a.stroke&&a.stroke!="none"){
+  const e=el("path",{...b,fill:"none",d:mk(),"stroke-linecap":"round","stroke-linejoin":"round","stroke-opacity":.85},p);
+  el("path",{...b,fill:"none",d:mk(),"marker-end":"none","stroke-linecap":"round","stroke-opacity":.45,"stroke-width":sw*.7},p);
+  first=first||e}
+ return first}
+function el(t,a,p){
+ if(t=="line")return hand([[+a.x1,+a.y1],[+a.x2,+a.y2]],false,a,p);
+ if(t=="rect"&&a.width!==undefined){const x=+a.x,y=+a.y,w=+a.width,h=+a.height;return hand([[x,y],[x+w,y],[x+w,y+h],[x,y+h]],true,a,p)}
+ if(t=="circle"){const pts=[];for(let i=0;i<18;i++){const th=i/18*6.2832;pts.push([+a.cx+a.r*Math.cos(th),+a.cy+a.r*Math.sin(th)])}return hand(pts,true,a,p)}
+ if(t=="poly")return hand(a.pts,true,a,p);
+ const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
+const defs=el("defs",{});
+const mk=el("marker",{id:"a",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto"},defs);
+el("path",{d:"M0 0L10 5L0 10z",fill:"var(--line)"},mk);
+function showTip(ev,h,b){tip.innerHTML="<b>"+h+"</b><span>"+b+"</span>";tip.style.display="block";
+ const w=tip.offsetWidth;tip.style.left=Math.min(ev.clientX+14,innerWidth-w-8)+"px";tip.style.top=(ev.clientY+14)+"px"}
+function hover(n,h,b){n.addEventListener("mousemove",e=>showTip(e,h,b));n.addEventListener("mouseleave",()=>tip.style.display="none")}
+
+function clos(){const D=new Set(G);let ch=1;while(ch){ch=0;E.forEach(([k,t,h])=>{if(k=="e"&&!D.has(h)&&t.every(x=>D.has(x))){D.add(h);ch=1}})}return D}
+function conf(D){const X=new Set();E.forEach(([k,t,h])=>{if(k=="c"&&D.has(t[0])&&D.has(h)){X.add(t[0]);X.add(h)}if(k=="n"&&t.every(x=>D.has(x)))t.forEach(x=>X.add(x))});return X}
+
+function draw(){
+ svg.querySelectorAll(".dyn").forEach(n=>n.remove());sd=7;
+ const g=el("g",{class:"dyn"}),DD=clos(),Xc=conf(DD);
+ COLS.forEach((l,i)=>{
+  el("rect",{x:X[i]-95,y:40,width:190,height:645,fill:"var(--band)"},g);
+  const t=el("text",{x:X[i],y:26,"text-anchor":"middle",style:"font-style:normal;letter-spacing:.05em;fill:var(--muted);stroke:none"},g);t.textContent=l.toUpperCase()});
+ E.forEach(([k,t,h,note],ei)=>{
+  if(k=="c"){const a=P[t[0]],b=P[h],on=DD.has(t[0])&&DD.has(h);
+   el("path",{d:`M${a.x} ${a.y}Q${(a.x+b.x)/2} ${(a.y+b.y)/2+45} ${b.x} ${b.y}`,fill:"none",stroke:"#d63b2b","stroke-width":1.4,"stroke-dasharray":"5 4",opacity:on?.95:.3},g);return}
+  const nog=k=="n",hx=nog?P[t[0]].x-70:P[h].x-55,hy=nog?P[t[0]].y:P[h].y+(OFF[ei]||0);
+  const on=nog?t.every(x=>DD.has(x)):(k=="i"?DD.has(h):t.every(x=>DD.has(x))),o=on?1:.16,col=nog?"#d63b2b":"var(--line)";
+  t.forEach(x=>el("line",{x1:P[x].x,y1:P[x].y,x2:hx,y2:hy,stroke:col,"stroke-width":1.2,opacity:o},g));
+  if(!nog){const dx=P[h].x-15-hx,dy=P[h].y-hy,d=Math.hypot(dx,dy)||1;
+   el("line",{x1:hx,y1:hy,x2:P[h].x-15,y2:P[h].y,stroke:col,"stroke-width":1.4,opacity:o,"marker-end":"url(#a)"},g)}
+  const s=el("rect",{x:hx-4,y:hy-4,width:8,height:8,fill:k=="e"||nog?col:"var(--card)",stroke:col,"stroke-width":1.5,opacity:o,style:"cursor:help"},g);
+  hover(s,nog?"nogood":k=="e"?"entails":"interprets",note)});
+ Object.keys(P).forEach(k=>{
+  const {x,y}=P[k],[nm,sh]=NM[k],d=DD.has(k),kd=kind(k);
+  let fill=d?KC[kd]:"#e9e5db",st="var(--fg)",sw=1,vs="";
+  if(kd=="exp"){const rs=RD[k],v=rs.some(r=>Xc.has(r))?"refuted":rs.some(r=>DD.has(r))?"supported":"silent";fill=VC[v];vs="<br>verdict: "+v}
+  if(Xc.has(k)){st="#d63b2b";sw=2.6}
+  const base=/^[ram]/.test(k),gr=el("g",{opacity:(kd=="exp"||d)?1:.55,style:"cursor:"+(base?"pointer":"help")},g),s=kd=="ver"?14:10;
+  if(kd=="aux")el("poly",{pts:[[x,y-11],[x+11,y],[x,y+11],[x-11,y]],fill,stroke:st,"stroke-width":sw},gr);
+  else if(kd=="exp"||kd=="rd"||kd=="riv")el("circle",{cx:x,cy:y,r:10,fill,stroke:st,"stroke-width":sw},gr);
+  else el("rect",{x:x-s,y:y-s,width:2*s,height:2*s,fill,stroke:st,"stroke-width":sw},gr);
+  const tx=el("text",{x,y:y-15,"text-anchor":"middle"},gr);tx.textContent=nm;
+  hover(gr,nm,sh+(kd=="exp"?vs:"<br>"+(d?(G.has(k)?"granted":"derived"):"not derived")+(Xc.has(k)?" · in conflict":"")+(base?"<br>click to "+(G.has(k)?"remove":"grant"):""))); 
+  if(base)gr.addEventListener("click",()=>{G.has(k)?G.delete(k):G.add(k);cur=-1;refresh()})});
+ const ex=Object.keys(RD),ref=ex.filter(e=>RD[e].some(r=>Xc.has(r))),sup=ex.filter(e=>RD[e].some(r=>DD.has(r))&&!ref.includes(e));
+ document.getElementById("st").innerHTML="<b>"+D.v+"</b>: "+(DD.has("v")?"<span style='color:#2e8b6e'>derived</span>":"<span style='color:#d63b2b'>not derived</span>")+
+  ". Experiments supported: "+sup.length+" of "+ex.length+(ref.length?"; refuted: "+ref.map(e=>NM[e][0]).join(", "):"")+
+  ". Derived or granted nodes: "+[...DD].length+" of "+Object.keys(P).filter(k=>k[0]!="e").length+"."}
+function refresh(){document.querySelectorAll("#bar button").forEach((b,i)=>b.setAttribute("aria-pressed",i==cur));draw()}
+
+const LEG=[["reading","#8a4fa0","50%"],["auxiliary / granted law","#ecb94e","0;transform:rotate(45deg) scale(.85)"],["derived claim / model","#e0792f","0"],["rival","#9b4a4a","50%"],["experiment supported","#2e8b6e","50%"],["experiment refuted","#d63b2b","50%"]];
+document.getElementById("leg").innerHTML=LEG.map(([l,c,r])=>`<span><i style="background:${c};border-radius:${r}"></i>${l}</span>`).join("");
+const TABS=[["rainbow","Rainbow"],["magnus","Magnus effect"],["soap","Soap film"]],tb=document.getElementById("tabs");
+TABS.forEach(([k,l])=>{const b=document.createElement("button");b.textContent=l;b.dataset.k=k;b.onclick=()=>{load(k);try{history.replaceState(null,"","#"+k)}catch(e){}};tb.appendChild(b)});
+function load(n){
+ if(!DS[n])n="rainbow";D=DS[n];E=D.E;RD=D.RD;COLS=D.cols;P={};NM={};OFF={};
+ D.T.split("\n").forEach(l=>{const[k,c,y,nm,s]=l.split("|");P[k]={x:X[+c],y:+y,c:+c};NM[k]=[nm,s]});
+ const cnt={},ix={};E.forEach(e=>{if(e[0]!="c")cnt[e[2]]=(cnt[e[2]]||0)+1});
+ E.forEach((e,j)=>{if(e[0]=="c")return;const h=e[2];ix[h]=ix[h]||0;OFF[j]=(ix[h]-(cnt[h]-1)/2)*16;ix[h]++});
+ const [pr,cb]=D.pre();PRE=pr;G=new Set(cb);cur=D.cur;
+ document.getElementById("ttl").innerHTML=D.ttl;document.getElementById("sub").innerHTML=D.sub;
+ document.getElementById("abs").innerHTML=D.abs;document.getElementById("cap").innerHTML=D.cap;
+ document.title=D.ttl.replace(/&nbsp;/g," ");
+ tb.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k==n));
+ const bar=document.getElementById("bar");bar.innerHTML="";
+ PRE.forEach(([l,s],i)=>{const b=document.createElement("button");b.textContent=l;b.onclick=()=>{G=new Set(s);cur=i;refresh()};bar.appendChild(b)});
+ refresh()}
+addEventListener("hashchange",()=>load(location.hash.slice(1)));
+load(location.hash.slice(1));
+</script>
+</body>
+</html>
