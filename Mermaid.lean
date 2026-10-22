@@ -12,6 +12,7 @@ import Scilib.Diffraction
 import Scilib.Bragg
 import Scilib.MendeleevSPeriodic
 import Scilib.MeselsonStahl
+import Scilib.OperaFasterThan
 
 open Scilib
 
@@ -129,6 +130,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Mendeleev's periodic law (1869-86)" Scilib.MendeleevSPeriodic.evidenceGraph)
   IO.FS.writeFile "viz/meselson-stahl.md"
     (toMarkdown "Meselson-Stahl (1958)" Scilib.MeselsonStahl.evidenceGraph)
+  IO.FS.writeFile "viz/opera-neutrinos.md"
+    (toMarkdown "OPERA faster-than-light neutrinos (2011-12)" Scilib.OperaFasterThan.evidenceGraph)
   
 
 end Mermaid

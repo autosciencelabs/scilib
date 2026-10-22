@@ -15,3 +15,4 @@ import Scilib.Diffraction
 import Scilib.Bragg
 import Scilib.MendeleevSPeriodic
 import Scilib.MeselsonStahl
+import Scilib.OperaFasterThan
