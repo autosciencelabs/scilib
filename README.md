@@ -4,12 +4,15 @@ A Lean4-based verifier for semi-formal scientific reasoning.
 
 - This is a Lean4 project built on top of [Physlib](https://physlib.io/) and [Mathlib](https://mathlib-initiative.org/).
 - We model the state of science as a hypergraph of theory and experiment nodes.
-- Nodes are primarily informal but can have optional references to Lean terms, poiting to definitions in Physlib.
+- Theory nodes are informal by default but can have optional references to Lean terms, pointing to definitions in Physlib.
 - Interpretation of an experiment is always a theory node.
 - An `entails` hyperedge connects a set of theory nodes to another theory node.
+- A special theory node `absurd` models logical contradictions.
 - History of science then becomes the changelog of this hyperlog.
 - Globally incompatible/contradictory theories can resemble each other under limits and approximations.
-- A special theory node `absurd` models logical contradictions.
+- Experiment protocols can also be formalized by modeling lab instruments as `Sensor` and `Actuator` monads.
+- Experiment observation can be formalized as a function on the lab's event log.
+- Therefore, the real world brings only a SINGLE BIT of information: Whether nature behaved in the way we hypothesized or not.
 
 
 [See examples](https://scilib.autoscience.dev/)
