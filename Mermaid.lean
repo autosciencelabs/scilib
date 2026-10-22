@@ -13,6 +13,7 @@ import Scilib.Bragg
 import Scilib.MendeleevSPeriodic
 import Scilib.MeselsonStahl
 import Scilib.OperaFasterThan
+import Scilib.BaadeSTwo
 
 open Scilib
 
@@ -132,6 +133,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Meselson-Stahl (1958)" Scilib.MeselsonStahl.evidenceGraph)
   IO.FS.writeFile "viz/opera-neutrinos.md"
     (toMarkdown "OPERA faster-than-light neutrinos (2011-12)" Scilib.OperaFasterThan.evidenceGraph)
+  IO.FS.writeFile "viz/baade-cepheids.md"
+    (toMarkdown "Baade's two Cepheid populations (1952)" Scilib.BaadeSTwo.evidenceGraph)
   
 
 end Mermaid
