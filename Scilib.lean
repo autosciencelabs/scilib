@@ -11,3 +11,4 @@ import Scilib.Magnus
 import Scilib.Superconductivity
 import Scilib.Bernoulli
 import Scilib.Leidenfrost
+import Scilib.Diffraction
