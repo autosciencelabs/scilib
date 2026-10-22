@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Evidence graph</title>
+<style>
+:root{--bg:#d9d7d1;--page:#fffefb;--card:#fffefb;--fg:#1a1a1a;--muted:#555;--line:#333;--bd:#1a1a1a;--band:#f5f2ea;
+--serif:Georgia,"Times New Roman","Latin Modern Roman",serif;--tt:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}}
+:root[data-theme="dark"]{--bg:#0e0e0d;--page:#1c1b18;--card:#1c1b18;--fg:#ece8df;--muted:#a8a396;--line:#b8b3a6;--bd:#ece8df;--band:#25231f}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+main{background:var(--page);max-width:1000px;margin:24px auto;padding:56px 56px 48px;box-shadow:0 2px 18px #0003}
+@media (max-width:700px){main{margin:0;padding:28px 16px}}
+h1{font-weight:400;font-size:1.9rem;text-align:center;margin:0 0 .5rem;line-height:1.2}
+p.auth,p.date{text-align:center;margin:0;font-size:1.05rem}p.date{color:var(--muted);margin-bottom:1.4rem}
+.abs{margin:0 auto 1.4rem;max-width:36rem;font-size:.95rem;line-height:1.5;text-align:justify}
+.abs b{display:block;text-align:center;margin-bottom:.3rem}
+h2{font-size:1.2rem;margin:1.8rem 0 .6rem}
+code{font-family:var(--tt);font-size:.88em}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font-family:var(--serif);font-size:.92rem;padding:5px 12px;border:1px solid var(--fg);border-radius:0;background:transparent;color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--fg);color:var(--page)}
+.wrap{overflow-x:auto}
+svg{display:block;width:100%;min-width:860px;height:auto}
+svg text{font-family:var(--serif);font-style:normal;font-size:14.5px;fill:var(--fg);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+#status{margin-top:10px;font-size:.97rem;line-height:1.5}
+.cap{text-align:justify;font-size:.9rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.86rem;color:var(--muted)}
+.leg i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--fg)}
+table{border-collapse:collapse;margin:0 auto;font-size:.97rem;width:100%}
+th,td{padding:6px 14px;text-align:left}
+thead tr{border-top:2px solid var(--fg);border-bottom:1px solid var(--fg)}
+tbody tr:last-child{border-bottom:2px solid var(--fg)}
+th.on,td.on{background:var(--band)}
+#tip{position:fixed;pointer-events:none;max-width:340px;background:var(--card);color:var(--fg);border:1px solid var(--bd);padding:8px 10px;font-size:.88rem;line-height:1.35;display:none;z-index:9}
+#tip b{display:block}#tip span{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1 id="ttl"></h1>
+<p class="auth">Evidence graph of <code id="ns"></code>, written in Lean&nbsp;4</p>
+<p class="date" id="date"></p>
+<div class="abs"><b>Abstract</b><span id="abs"></span></div>
+
+<h2>1&ensp;The evidence graph</h2>
+<div class="bar" id="bar"></div>
+<div class="wrap"><svg id="g" role="img" aria-label="Evidence graph"></svg></div>
+<div id="status"></div>
+<p class="cap" id="cap1"></p>
+
+<h2>2&ensp;What each world concludes</h2>
+<table id="tab"></table>
+<p class="cap"><b>Table 1:</b> Verdict for each experiment. “Supported” means the world leads to what was observed. “Refuted” means the world leads to something that cannot hold together with what the experiment observed. “Silent” means the world says nothing about it. The selected world is shaded.</p>
+<div class="leg" id="leg"></div>
+</main>
+<div id="tip"></div>
+<script>
+var D={"abstract":"This page lays out the evidence graph of Scilib.MendeleevSPeriodic: 3 experiments, 9 derived claims and 9 assumptions or models. 3 pair(s) of statements cannot both be true: “The atomic weights of the elements appear…” against “Several atomic weights of the table, such…”; “A few atomic weights will probably require…” against “The accepted atomic weights of the known…”; “A few atomic weights will probably require…” against “Later measurements confirmed the original…”. A world is a set of assumptions granted together. World A supports 3 of 3 experiments, refutes 0 and is silent on 0. It does not grant: Several atomic weights of the table, such…, The accepted atomic weights of the known…, Later measurements confirmed the original…. World B supports 3 of 3 experiments, refutes 0 and is silent on 0. It does not grant: The atomic weights of the elements appear…, The table places tellurium, Te=128…. Hover or tap any box for its full statement.","banner":[6,10],"conflicts":[[12,13],[14,16],[14,17]],"date":"October 22, 2026","nodes":[{"id":0,"kind":"claim","label":"The specific gravity of gallium was 5.935…","name":"galliumSG","relies":[6,10],"stmt":"The specific gravity of gallium was 5.935, the mean of 5.90 and 5.97, and the prevision of Mendeleev is thus exactly verified.","sub":"Lecoq de Boisbaudran 1877"},{"id":1,"kind":"claim","label":"The specific gravity of germanium, 5.469…","name":"germaniumSG","relies":[6,10],"stmt":"The specific gravity of germanium, 5.469, is quite in agreement with Mendeleev's calculation, according to which it should be about 5.5.","sub":"Winkler 1886"},{"id":2,"kind":"claim","label":"Germanium tetrachloride, GeCl4, has…","name":"germaniumCl4","relies":[6,10],"stmt":"Germanium tetrachloride, GeCl4, has the molecular volume 113.3, calculated from its composition and specific gravity, and Mendeleev prognosticated the specific gravity of EsCl4 to be about 1.9, the volume 113, the boiling point probably a little below 100.","sub":"Winkler 1886"},{"id":3,"kind":"claim","label":"The new element germanium is no other than…","name":"germaniumIsEkaSi","relies":[1,2],"stmt":"The new element germanium is no other than the eka-silicium prognosticated fifteen years ago by Mendeleev, and there can be no longer any doubt of it.","sub":"Winkler 1886"},{"id":4,"kind":"claim","label":"The atomic weight of scandium is 44; this…","name":"scandiumWeight","relies":[6,10],"stmt":"The atomic weight of scandium is 44; this is the value Mendeleev assigned to the predicted eka-boron.","sub":"Nilson 1879"},{"id":5,"kind":"claim","label":"Chemically analogous elements have either…","name":"knownPeriodic","relies":[6],"stmt":"Chemically analogous elements have either similar atomic weights (Pt, Ir, Os), or weights which increase by equal increments (K, Rb, Cs).","sub":"Mendeleev 1869"},{"id":6,"kind":"model","label":"The elements, if arranged according to their…","name":"periodicLaw","relies":[],"stmt":"The elements, if arranged according to their atomic weights, exhibit a periodicity of properties, and the magnitude of the atomic weight determines the properties of the element.","sub":"Mendeleev 1869"},{"id":7,"kind":"model","label":"The properties of the elements recur…","name":"octaves","relies":[],"stmt":"The properties of the elements recur at intervals of eight when the elements are ordered by atomic weight, like the notes within a musical scale.","sub":"Wikipedia, History of the periodic table"},{"id":8,"kind":"claim","label":"The arrangement leaves open places under…","name":"tableHasGaps","relies":[6],"stmt":"The arrangement leaves open places under aluminium and under silicon, marked ?=68 and ?=70.","sub":"Mendeleev 1869"},{"id":9,"kind":"claim","label":"One can predict the discovery of many new…","name":"newAnalogues","relies":[8],"stmt":"One can predict the discovery of many new elements, for example analogues of Si and Al with atomic weights of 65-75.","sub":"Mendeleev 1869"},{"id":10,"kind":"model","label":"The position of a hypothetical element…","name":"interpolation","relies":[],"stmt":"The position of a hypothetical element in a natural family approximately indicates its properties.","sub":"status: declared"},{"id":11,"kind":"model","label":"Lothar Meyer declared germanium to be…","name":"meyerCurve","relies":[],"stmt":"Lothar Meyer declared germanium to be eka-silicium, and added that according to his curve of the atomic volumes it should be low-melting and perhaps easy to evaporate.","sub":"Winkler 1886"},{"id":12,"kind":"model","label":"The atomic weights of the elements appear…","name":"proutHypothesis","relies":[],"stmt":"The atomic weights of the elements appear to be whole multiples of the atomic weight of hydrogen.","sub":"Wikipedia, Prout's hypothesis"},{"id":13,"kind":"model","label":"Several atomic weights of the table, such…","name":"weightsNotWhole","relies":[],"stmt":"Several atomic weights of the table, such as Al=27,4, Se=79,4 and Cl=35,5, are not whole multiples of the atomic weight of hydrogen, H=1.","sub":"Mendeleev 1869"},{"id":14,"kind":"claim","label":"A few atomic weights will probably require…","name":"teCorrection","relies":[6,15],"stmt":"A few atomic weights will probably require correction; for example Te cannot have the atomic weight 128, but rather 123-126.","sub":"Mendeleev 1869"},{"id":15,"kind":"model","label":"The table places tellurium, Te=128…","name":"teInverted","relies":[],"stmt":"The table places tellurium, Te=128, in the row of oxygen, sulphur and selenium, before iodine, J=127, in the row of fluorine, chlorine and bromine.","sub":"Mendeleev 1869"},{"id":16,"kind":"model","label":"The accepted atomic weights of the known…","name":"weightsAccurate","relies":[],"stmt":"The accepted atomic weights of the known elements, such as the atomic weight 128 of tellurium, are accurate.","sub":"status: discovered"},{"id":17,"kind":"model","label":"Later measurements confirmed the original…","name":"teWeightMeasured","relies":[],"stmt":"Later measurements confirmed the original atomic weight of tellurium, about 127.6, which is higher than the atomic weight of iodine.","sub":"Wikipedia, Dmitri Mendeleev"},{"id":18,"kind":"experiment","label":"Six samples of pure gallium, extracted…","name":"galliumRun","relies":[],"stmt":"Six samples of pure gallium, extracted from about 435 kg of raw materials, were united into one homogeneous piece, and its specific gravity relative to water at 23° was measured. Observation: Its specific gravity at 23° (relative to water at 23°) was: (1) 5.90 mean: 5.935 (2) 5.97","sub":"Lecoq de Boisbaudran 1877"},{"id":19,"kind":"experiment","label":"The specific gravity of germanium…","name":"germaniumRun","relies":[],"stmt":"The specific gravity of germanium and of germanium tetrachloride was measured by P. Mann. Observation: The specific gravity of germanium was found by P. Mann = 5.469. The tetrachloride is a colorless, thin liquid of specific gravity 1.887 at 18.0° as measured by P. Mann. Its boiling point is around 80°. From its composition GeCl4 and its specific gravity, its (molecular) volume is calculated as 113.3.","sub":"Winkler 1886"},{"id":20,"kind":"experiment","label":"The atomic weight of scandium was calculated…","name":"scandiumRun","relies":[],"stmt":"The atomic weight of scandium was calculated for the formula ScO and for the formula Sc2O3 from the analysis of the new earth. Observation: The atomic weight of scandium = Sc is less than 90, calculated for the formula ScO. The atomic weight of scandium is 44.","sub":"Nilson 1879"}],"ns":"Scilib.MendeleevSPeriodic","rows":[{"exp":18,"pre":[],"pred":-1,"reading":0,"title":"Lecoq de Boisbaudran 1877","whyConflict":"These two statements cannot both be true.","whyExp":"","whyPre":"The place under aluminium, with its neighbours, indicates the specific gravity of the new metal."},{"exp":19,"pre":[],"pred":-1,"reading":1,"title":"Winkler 1886","whyConflict":"These two statements cannot both be true.","whyExp":"","whyPre":"The place under silicon, with its neighbours, indicates the specific gravity of the new element."},{"exp":20,"pre":[],"pred":-1,"reading":4,"title":"Nilson 1879","whyConflict":"These two statements cannot both be true.","whyExp":"","whyPre":"The open place after calcium, with its neighbours, indicates the atomic weight of the new element."}],"title":"Mendeleev SPeriodic as an Evidence Graph","worlds":[{"derived":[5,8,0,1,2,4,3,14,9],"dropped":[13,16,17],"key":"A","label":"Keeps The atomic weights… and 1 more","members":[6,7,10,11,12,15],"summary":"World A supports 3 of 3 experiments, refutes 0 and is silent on 0. It does not grant: Several atomic weights of the table, such…, The accepted atomic weights of the known…, Later measurements confirmed the original….","verdict":{"18":"supported","19":"supported","20":"supported"}},{"derived":[5,8,0,1,2,4,3,9],"dropped":[12,15],"key":"B","label":"Keeps Several atomic weights… and 2 more","members":[6,7,10,11,13,16,17],"summary":"World B supports 3 of 3 experiments, refutes 0 and is silent on 0. It does not grant: The atomic weights of the elements appear…, The table places tellurium, Te=128….","verdict":{"18":"supported","19":"supported","20":"supported"}}]};
+var NS="http://www.w3.org/2000/svg";
+var N=D.nodes,W=D.worlds;
+var KC={model:"#8a4fa0",claim:"#e0792f",experiment:"#555"},VC={supported:"#2e8b6e",refuted:"#d63b2b",silent:"#dcd8cf"};
+var WC=["#2f4b8f","#17707a","#8a6a14","#7a3b6b","#3b7a3f","#7a4b3b"];
+var SY={supported:"✓",refuted:"✗",silent:"—"};
+var svg=document.getElementById("g"),tip=document.getElementById("tip"),mode="all";
+document.title=D.title;document.getElementById("ttl").textContent=D.title;
+document.getElementById("ns").textContent=D.ns;document.getElementById("date").textContent=D.date;
+document.getElementById("abs").textContent=D.abstract;
+W.forEach(function(w){w.mem={};w.members.forEach(function(i){w.mem[i]=1});w.der={};w.derived.forEach(function(i){w.der[i]=1})});
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
+var defs=el("defs",{});
+[["a","var(--line)"],["ab","#2b6cb0"],["ac","#d63b2b"]].forEach(function(d){var m=el("marker",{id:d[0],viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},defs);el("path",{d:"M0 0L10 5L0 10z",fill:d[1]},m)});
+function showTip(ev,h,b){tip.innerHTML="<b>"+esc(h)+"</b><span>"+b+"</span>";tip.style.display="block";var w=tip.offsetWidth;tip.style.left=Math.min(ev.clientX+14,innerWidth-w-8)+"px";tip.style.top=(ev.clientY+14)+"px"}
+function hover(n,h,b){n.addEventListener("mousemove",function(e){showTip(e,h,b)});n.addEventListener("mouseleave",function(){tip.style.display="none"});n.addEventListener("click",function(e){showTip(e,h,b)})}
+function wrap(s,n){var w=s.split(" "),L=[""];w.forEach(function(x){var c=L[L.length-1];if((c+" "+x).trim().length<=n||!c)L[L.length-1]=(c+" "+x).trim();else L.push(x)});
+ if(L.length>2){L=L.slice(0,2);L[1]=L[1].replace(/.{0,2}$/,"")+"…"}return L}
+var BW=210,BH=58,X0=130,X1=400,X2=670,STEP=70;
+function relies(n){return n.relies.length?"<br>Relies on: "+n.relies.map(function(i){return esc(N[i].label)}).join(", "):""}
+function node(g,id,x,y,sel){var n=N[id],grp=el("g",{opacity:dim(id,sel)?.28:1,style:"cursor:help"},g);
+ el("rect",{x:x-BW/2,y:y-BH/2,width:BW,height:BH,rx:3,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},grp);
+ el("rect",{x:x-BW/2,y:y-BH/2,width:7,height:BH,fill:KC[n.kind]},grp);
+ var L=wrap(n.label,26),sub=n.sub.length>30?n.sub.slice(0,29)+"…":n.sub;
+ var y0=L.length==2?(sub?y-14:y-6):(sub?y-4:y+5);
+ L.forEach(function(s,i){var t=el("text",{x:x-BW/2+18,y:y0+i*16,style:"font-weight:600;stroke:none;font-size:13.2px"},grp);t.textContent=s});
+ if(sub){var u=el("text",{x:x-BW/2+18,y:y0+L.length*16,style:"font-size:12.5px;fill:var(--muted);stroke:none"},grp);u.textContent=sub}
+ if(!sel&&n.kind!="experiment")W.forEach(function(w,j){if(inW(w,id))el("circle",{cx:x+BW/2-12-j*14,cy:y-BH/2+10,r:4.5,fill:WC[j%6]},grp)});
+ hover(grp,n.label,esc(n.stmt)+"<br><code>"+esc(n.name)+"</code>"+(n.kind=="claim"?relies(n):""))}
+function inW(w,i){var k=N[i].kind;return k=="experiment"?true:k=="model"?!!w.mem[i]:(!!w.mem[i]||!!w.der[i])}
+function dim(i,sel){return sel?!inW(sel,i):false}
+function link(g,x1,y1,x2,y2,col,k,note,dash,both){
+ var l=el("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:col,"stroke-width":1.8,"stroke-dasharray":dash||"none","marker-end":"url(#"+(k=="leads"?"ab":k=="conflict"?"ac":"a")+")"},g);
+ if(both)l.setAttribute("marker-start","url(#ac)");
+ var hx=(x1+x2)/2,hy=(y1+y2)/2,s=el("rect",{x:hx-6,y:hy-6,width:12,height:12,fill:k=="tested"?col:"var(--card)",stroke:col,"stroke-width":1.8,style:"cursor:help"},g);
+ hover(s,k=="leads"?"leads to":k=="conflict"?"cannot both be true":"was tested by",esc(note||""))}
+function draw(){
+ svg.querySelectorAll(".dyn").forEach(function(n){n.remove()});
+ var g=el("g",{"class":"dyn"}),sel=mode=="all"?null:W.filter(function(w){return w.key==mode})[0];
+ var top=40,anyPred=D.rows.some(function(r){return r.pred>=0});
+ if(D.banner.length){el("rect",{x:20,y:top,width:960,height:62,fill:"var(--card)",stroke:"var(--fg)","stroke-width":1.3},g);el("rect",{x:20,y:top,width:7,height:62,fill:KC.model},g);
+  var b1=el("text",{x:42,y:top+26,style:"font-weight:600;stroke:none"},g);b1.textContent="Where every row starts";
+  var s=D.banner.map(function(i){return N[i].label}).join("; ");if(s.length>120)s=s.slice(0,118)+"…";
+  var b2=el("text",{x:42,y:top+48,style:"font-size:13px;fill:var(--muted);stroke:none"},g);b2.textContent=s;top+=76}
+ [[anyPred?"ASSUMED OR PREDICTED":"ASSUMED",X0],["READ FROM THE DATA",X1],["THE EXPERIMENT",X2]].forEach(function(h){var t=el("text",{x:h[1],y:top+12,"text-anchor":"middle",style:"letter-spacing:.05em;fill:var(--muted);stroke:none;font-size:12px"},g);t.textContent=h[0]});
+ top+=22;
+ D.rows.forEach(function(r,li){var hasPred=r.pred>=0,pre=r.pre,y0=top+56,y,bottom;
+  if(hasPred){y=y0;bottom=y+(pre.length?84+(pre.length-1)*STEP:0)+BH/2+14}
+  else{var k=Math.max(1,pre.length);y=y0+(k-1)*STEP/2;bottom=y0+(k-1)*STEP+BH/2+14}
+  if(li%2==0)el("rect",{x:6,y:top,width:988,height:bottom-top,fill:"var(--band)"},g);
+  var lt=el("text",{x:20,y:top+17,style:"font-weight:700;stroke:none;font-size:13px;fill:var(--muted)"},g);lt.textContent=(li+1)+"  "+r.title;
+  if(hasPred){link(g,X0+BW/2,y,X1-BW/2,y,"#d63b2b","conflict",r.whyConflict,"5 4",1);
+   pre.forEach(function(p,j){var py=y+84+j*STEP;link(g,X1,py-BH/2,X1,(j?py-STEP:y)+BH/2+2,"#2b6cb0","leads",r.whyPre);node(g,p,X1,py,sel)});
+   node(g,r.pred,X0,y,sel)}
+  else pre.forEach(function(p,j){var py=y0+j*STEP;link(g,X0+BW/2,py,X1-BW/2,y,"#2b6cb0","leads",r.whyPre);node(g,p,X0,py,sel)});
+  link(g,X1+BW/2,y,X2-BW/2,y,"var(--line)","tested",r.whyExp);
+  node(g,r.reading,X1,y,sel);node(g,r.exp,X2,y,sel);
+  var ws=sel?[sel]:W;
+  ws.forEach(function(w,j){var v=w.verdict[r.exp],vt=el("text",{x:X2+BW/2+14,y:y-8+j*22,style:"font-weight:600;stroke:none;font-size:13.5px"},g);
+   vt.innerHTML='<tspan style="fill:var(--muted);font-weight:400">'+(W.length>1?"World "+w.key:"Verdict")+':</tspan> <tspan style="fill:'+(v=="silent"?"var(--muted)":VC[v])+'">'+SY[v]+" "+v+"</tspan>"});
+  top=bottom});
+ svg.setAttribute("viewBox","0 0 1000 "+(top+6));
+ status()}
+function tab(){
+ document.getElementById("tab").innerHTML="<thead><tr><th>Experiment</th>"+W.map(function(w){return '<th class="'+(mode==w.key?"on":"")+'">World '+w.key+"</th>"}).join("")+"</tr></thead><tbody>"+
+ D.rows.map(function(r){return "<tr><td><b>"+esc(N[r.exp].label)+"</b></td>"+W.map(function(w){var v=w.verdict[r.exp];return '<td class="'+(mode==w.key?"on":"")+'"><span style="color:'+VC[v]+';font-weight:700">'+SY[v]+"</span> "+v+"</td>"}).join("")+"</tr>"}).join("")+"</tbody>"}
+function status(){tab();var s=document.getElementById("status");
+ if(mode=="all"){s.innerHTML=W.map(function(w){return "<div>"+esc(w.summary)+"</div>"}).join("");return}
+ var w=W.filter(function(x){return x.key==mode})[0];s.innerHTML="<b>World "+w.key+" — "+esc(w.label)+".</b> "+esc(w.summary)}
+function setMode(m){mode=m;document.querySelectorAll("#bar button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m==m)});draw()}
+var bar=document.getElementById("bar"),opts=W.length>1?[["all","Compare all"]]:[];
+W.forEach(function(w){opts.push([w.key,"World "+w.key+" — "+w.label])});
+opts.forEach(function(p){var b=document.createElement("button");b.textContent=p[1];b.dataset.m=p[0];b.setAttribute("aria-pressed",p[0]==mode);b.onclick=function(){setMode(p[0])};bar.appendChild(b)});
+if(W.length==1)mode=W[0].key;
+document.getElementById("cap1").innerHTML="<b>Figure 1:</b> One row for each experiment, "+D.rows.length+" in all. The experiment is on the right and the reading drawn from its data is in the middle. "+(D.conflicts.length?"The red dashed line joins a prediction and a reading that cannot both be true. ":"")+"Blue arrows lead from an assumption or a claim to what it implies. "+(W.length>1?"Small coloured dots on a box show which worlds include it. ":"")+"Faded boxes are not part of the world you selected.";
+document.getElementById("leg").innerHTML='<span><i style="background:'+KC.model+'"></i>assumption or model</span><span><i style="background:'+KC.claim+'"></i>claim, prediction or reading</span><span><i style="background:'+KC.experiment+'"></i>experiment</span><span><i style="background:transparent;border:1.5px solid #2b6cb0"></i>leads to</span><span><i style="background:#555"></i>was tested by</span>'+(D.conflicts.length?'<span style="color:#d63b2b">- - cannot both be true</span>':'')+W.map(function(w,j){return '<span><i style="background:'+WC[j%6]+';border-radius:50%"></i>in world '+w.key+'</span>'}).join("");
+draw();
+</script>
+</body>
+</html>
