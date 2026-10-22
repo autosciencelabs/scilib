@@ -16,6 +16,7 @@ import Scilib.OperaFasterThan
 import Scilib.BaadeSTwo
 import Scilib.LkMaterialsRivals
 import Scilib.GevDiphotonExcess
+import Scilib.PenziasWilsonHolmdel
 
 open Scilib
 
@@ -141,6 +142,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "LK-99 (2023)" Scilib.LkMaterialsRivals.evidenceGraph)
   IO.FS.writeFile "viz/750-gev-excess.md"
     (toMarkdown "750 GeV diphoton excess (2015-16)" Scilib.GevDiphotonExcess.evidenceGraph)
+  IO.FS.writeFile "viz/penzias-wilson-cmb.md"
+    (toMarkdown "Penzias-Wilson, Holmdel horn antenna (1964-65)" Scilib.PenziasWilsonHolmdel.evidenceGraph)
   
 
 end Mermaid
