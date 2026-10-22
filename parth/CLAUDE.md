@@ -8,6 +8,67 @@ Project context for the scientific-reasoning verifier: Parth (the user) builds i
 - Skip long philosophy. Prefer concrete mappings to the mentor's files.
 - Don't write code unless asked.
 
+## READ FIRST: current state and how to run the flow (updated 2026-10-19)
+
+**Official language = whatever is in the Scilib repo (`Scilib/Basic.lean`) and nothing else.** Nodes: `Theory` (statement, optional Lean names, `sources` strings) and `Experiment` (protocol, observation, `sources` strings). Edges: `entails` (premises -> conclusion) and `interprets` (theory -> experiment); `implies`, `nogood`, `contradicts` are helpers built from `entails`. Everything about `.sci`, "Empirica" and `earth.png` below is **old history: ignore it** (Parth: "forget the old things").
+
+### Standing rules (from Parth)
+- All work in `parth/` on branch `domains`. Do not touch `Scilib/Basic.lean`, `lakefile.toml` or Mariya's `Scilib/HeatCapacityOfSolids.lean`. Do not merge or close PR #1 unless he says so. Parth does not want this to become a PR-merging project: think about the science and the language.
+- **Never commit, push or open/merge a PR without his explicit word** (a direct instruction covers that one action only).
+- **Money:** every subagent runs on Sonnet (`model: "sonnet"`), at most 2 agents per task, with caps on pages and sentences written in the prompt. Never ask an agent to copy a whole paper. No paid step (agent or Jev batch) starts without his go-ahead.
+- Jev API key is the environment variable `TYPESAFE_API_KEY`; never print, hard-code or store it.
+- Keep answers **short and simple**: lead with the answer, tables, no jargon. When he asks "new nodes and edges", give the NEEDS.md table (Item | Kind | Verdict) and nothing else: he likes that format.
+
+### The flow (one script: `python parth/flow.py ...`; guide in `parth/FLOW.md`)
+```
+0 PICK    new <domain#> <A|B|C> [--id ID] [--name LeanName]   free  scaffolds parth/sources/<id>/{episode.json,ledger.json}, Scilib/<Name>.lean from TAXONOMY.md
+1 BUILD   write the Lean graph + the ledger (sources, quotes, one entry per node); add the graph to Scilib.lean, parth/verify/Export.lean `graphs`, Mutate.lean `episodes`
+2 VERIFY  verify <ep>                                         free (Jev answers cached)  -> writes REPORT.md + cache/verify_state.json   GATE
+3 FIND    find <ep> --prepare [--sentences N=40] [--repeat K]  free  makes runs/<n>/{input.json,prompt.md} (fresh unused sentences, or the same sample as run K)
+          (PAID, measured 69k Sonnet tokens for 40 sentences) Claude starts ONE Sonnet reader with runs/<n>/prompt.md -> runs/<n>/needs.json
+          find <ep> --record <n> --tokens T                   note what the run really cost (from the agent's result)
+          find <ep> --check                                   validate every run's needs.json (kinds, ids, max 25 needs)
+          find <ep> --match [--yes]                           cache-only without --yes; with --yes sends missing Jev pairs (cents)
+4 REPORT  report <ep>                                         free  writes NEEDS.md (table: Item | Kind | Verdict solid/tentative/weak, rule in needs_report.py), NEEDS_DETAILS.md, parth/NEEDS_ALL.md
+          status <ep> [--fast]                                the board: done / ready / blocked, with the reason
+```
+- The gate: step 3 needs step 2 = PASS **for the current graph and ledger** (sha256 of the fresh Lean export and of ledger.json, line endings normalised). Change the graph and you must rerun `verify`.
+- Reader runs live in `cache/runs/<n>/`. `--prepare` makes a NEW run (it refuses while the last run is unanswered, unless `--force`). Two or more runs are the point: one reader is noisy. `--match` merges needs of different runs that Jev calls the same structure (best match only, never two needs of one run, score at least 0.45) and the report says `[read a/b]`. Use `--repeat K` for the same sample (measures reader noise) and plain `--prepare` for new sentences (more coverage). Old `B_needs*.json` files are migrated automatically.
+- Run Python with the msys `python3`; Lean through `lake env lean --run ...` (Lean 4.35.0, Physlib v4.35.0). `lake build` must still pass.
+- Prerequisite for Jev steps: `TYPESAFE_API_KEY` set in the shell (check with `[ -n "$TYPESAFE_API_KEY" ] && echo set`; never echo the value). Without it, cached runs still work.
+
+### What the pieces are (all under `parth/`)
+- `verify/` (kept, trusted layer): `run.py` = coverage, quote check (primary-paper passages read twice from page images), blind readers, triangulation (>=2 independent sources), `jev_check.py` (Jev "does this quote state this claim?" with automatic wrong-version controls: numeric tweak, negation, mismatched quote), mutation test (`Mutate.lean`, 106/106 killed on 2B), `selftest/run_selftest.py` (7 seeded faults). `Export.lean` prints a graph as JSON. README there explains layers and rules.
+- `map/` (language-gap finder): `fetch.py` (cached pages and sentence samples), `catalog_check.py`, `scorer.py` (Jev "same kind of structure?" pairs, threaded, cached in `map/cache/structure_cache.json`), `align.py`, `rediscover.py`, `map_report.py` (the one-off triangulation, report in `parth/MAP.md`), `needs_match.py` + `needs_report.py` (the per-episode flow steps). `map/cache/` holds route A (7 expert ontologies: SEPIO, Micropublications, EXPO, ECO, Assurance 2.0, Toulmin, Nanopublication) and route C (needs derived from the 10 checks in TAXONOMY.md), `core.md` = plain description of the official language. `cache/` folders are gitignored.
+- Jev facts: `POST https://api.typesafe.ai/v1/systemone`, model pinned `jev-1.13.0`, yes/no answers = "noul" probability. It judges text only; it does not know the science. Tested: 0/61 wrong versions accepted on 2B. Its "same kind of thing" matching is strict: threshold is set just above the highest control score (set from the controls each time; 0.2 on the last 2B run, but merging two needs into one never goes below 0.45).
+
+### State of the examples
+- **2B Meselson-Stahl (1958)** (`parth/sources/meselson-stahl-1958/`, `Scilib/MeselsonStahl.lean`, 36 edges, 51 checks): steps 0-4 done; verification PASS (0 errors, 7 review notes); THREE reader runs (runs 1, 2: 60 sentences each; run 3: 40 new sentences, 69,203 tokens) matched; result table in `NEEDS.md`: solid = publication metadata (node), control-vs-test link (edge), method-reuse link (edge); tentative = failed or null attempt, open question (nodes), idea origin or analogy (edge); weak = ordered comparison of quantities (edge). All other needs are fields/rules on existing nodes and edges. Each new batch of sentences still adds new one-off items, so the list is not saturated. Known modelling gaps are in section 6 of its REPORT.md.
+- **Heat capacity of solids**: Mariya's graph (on `main`, 38 guards pass). No ledger or source check yet; `episode.json` exists only so its reader needs can be matched across episodes. Its source-finding agents were stopped (never ran).
+- **2A Foucault / nature of light**: not built. `flow.py new 2 A` scaffolds it.
+- Candidates from other routes (not from the reader): Quantity (value+unit+uncertainty), Assumption with a status (declared/suspected/discovered), Prediction vs observation kind, `rules_out`, `reduces_to` (limit), "rivals predict differently". Use `parth/MAP.md` and `NEEDS_ALL.md`. Reader reliability is still only 2 runs on one paper.
+
+### Planned next examples (one per remaining domain, chosen as the cheapest; Parth, 2026-10-19)
+Done so far: 2B Meselson-Stahl, 4B Baade's Cepheids, 6B 750 GeV excess. Run the other 7 domains with one example each, in this order (cheapest first). Cost driver = number of agents (about 65k fixed each; a reader run measured 70k even with a self-contained prompt) and whether sources are plain text (scanned papers need extra page-reading agents). Page reachability was spot-checked (HTTP 200) but sources are NOT yet read or verified.
+
+| Order | Domain | Example | Sources (reachable) | Should test in the language |
+|---|---|---|---|---|
+| 1 | 10 Resolving power | **10B** Ether and the speed of light (Michelson-Morley 1887) | Wikisource copy of the 1887 paper, Wikipedia | Was the instrument precise enough to see the effect; a null result |
+| 2 | 8 Causal intervention and controls | **8A** John Snow and cholera (1854) | Wikipedia (Broad Street outbreak); Snow's book as an archive.org scan (OCR) | Intervention (pump handle), comparison groups; the UCLA/Wikisource URLs returned 404 |
+| 3 | 3 Blame among auxiliaries | **3C** OPERA faster-than-light neutrinos (2011) | arXiv 1109.4897, Wikipedia | Blame on one part of a measurement chain (the cable fault) |
+| 4 | 5 Conflicting results and replication | **5A** LK-99 (2023) | arXiv 2307.12008, replication preprints, Wikipedia | Replication links, conflicting results, a claim withdrawn |
+| 5 | 1 Fit vs test | **1C** Mendeleev's periodic table | Wikipedia (Mendeleev, predicted elements) | Prediction made before the data vs fitted to known data |
+| 6 | 7 Exploratory discovery | **7B** Penzias-Wilson, 6 m horn antenna | Nobel lecture (text), Wikipedia; the 1965 paper is a scan | Record kept apart from interpretation; systematics ruled out one by one |
+| 7 | 9 Extrapolation to another system | **9B** Thalidomide | Wikipedia (Thalidomide, Thalidomide scandal), regulator texts | Animal-to-human extrapolation link |
+
+Rough cost per example: about 280k tokens (2 reader runs + 2 blind readers; verify cost not measured). Skipped as more expensive: 1A, 5C, 7A, 9C (paywalled or scanned), 7C (scanned), 9A and 10A (machine-learning papers, long and numeric). Start one only when Parth says go; check the sources by reading them before building the graph.
+
+### Gotchas that cost time
+- Writing Python through a bash heredoc mangles backslashes (`"\r\n"` becomes real line breaks): write files with the Write/Edit tools, not heredocs, when the code contains backslashes.
+- On Windows `write_text` turns `\n` into `\r\n`: hashes are computed after normalising line endings.
+- `python parth/verify/run.py <ep> --no-lean` reuses the cached graph and mutation results and rewrites `verify_state.json` (fast).
+- Local git state: branch `domains` has local merge commits of `origin/main`, a stash `pre-merge-main`, and many uncommitted files (docs fixes, `MeselsonStahl.lean`, `parth/verify`, `parth/map`, `parth/sources`, `parth/flow.py`, `FLOW.md`). Nothing of this session is pushed.
+
 ## Goal
 Build a **verifier for scientific reasoning**, inspired by Lanyon AI: a tool that checks whether scientific reasoning is fair (real tests, visible assumptions, correct blame), not just whether the math is right.
 
@@ -222,11 +283,15 @@ Others noted in `RELATED_WORK.md`: EvoSCM (2609.01526), ACED-Bench (2610.14381),
 
 ---
 
-## Lean Implementation: Empirica (OFFICIAL; updated 2026-10-17)
+## Lean Implementation: Scilib (OFFICIAL; updated 2026-10-18)
 
-**Official repo:** https://github.com/autosciencelabs/empirica (`origin`, branch `main`). The team decided to use this repo, and **the structs in `Empirica/Basic.lean` as they stand are the official ones.** This file was first written before the repo was finalized, so the `.sci` sections above are background and design history (Nilesh's original language), not the official structure. Where the two differ, the Lean code wins. `CLAUDE.md` and `TAXONOMY.md` are not yet committed to the repo (only the `init` commit exists as of this date).
+**Official repo:** https://github.com/autosciencelabs/scilib (moved from `autosciencelabs/empirica`; `origin`, branch `main`). The team decided to use this repo, and **the structs in `Scilib/Basic.lean` as they stand are the official ones.** This file was first written before the repo was finalized, so the `.sci` sections above are background and design history (Nilesh's original language), not the official structure. Where the two differ, the Lean code wins. `CLAUDE.md`, `TAXONOMY.md` and `RELATED_WORK.md` live on the `domains` branch (PR #1) and are not on `main` yet.
 
-**Files:** `Empirica/Basic.lean` (the core; namespace `Empirica`), re-exported by `Empirica.lean`. Lake project name: `empirica` (library `Empirica`, executable root `Main.lean`). CI: `.github/workflows/lean_action_ci.yml`.
+**Renamed 2026-10-18:** Nilesh renamed the project from Empirica to Scilib (commit `93515e0`). Older text in these notes that says "Empirica" means the same project. `Basic.lean` changed only in the namespace and the doc comment.
+
+**Files:** `Scilib/Basic.lean` (the core; namespace `Scilib`), re-exported by `Scilib.lean`. Lake project name: `scilib` (library `Scilib`, executables `scilib` from `Main.lean` and `mermaid` from `Mermaid.lean`). It depends on Physlib v4.35.0 (Lean v4.35.0). `lake exe mermaid` writes the diagrams in `viz/`. CI: `.github/workflows/lean_action_ci.yml`.
+
+**Example graphs on `main` (Nilesh, 2026-10-18):** `Scilib/ShapeOfEarth.lean`, `Scilib/Heliocentrism.lean` (imports ShapeOfEarth) and `Scilib/Semiconductor.lean`, each with `#guard` checks. They are evidence chains toward one conclusion: readings and assumptions go into `entails`, and a single `contradicts` pair marks the rival. They have no multi-rival `composed_of`, `forbids`, `reduces_to` or `relies_on` status, so they are poorer than `earth.png`. Whether the richer form is wanted is an open question for Nilesh.
 
 Parth is building a **Lean-native implementation** of Nilesh's ontology ideas, starting from a deliberately minimal core and growing it with 10 domain examples as the hackathon deliverable.
 
@@ -242,7 +307,7 @@ Parth is building a **Lean-native implementation** of Nilesh's ontology ideas, s
 | Edge helpers | `Edge.entails`, `Edge.implies` (one premise), `Edge.nogood` (premises entail absurd), `Edge.contradicts a b` (= `nogood [a, b]`), `Edge.interprets`. |
 | `Graph` | `edges : List Edge`. Nodes are whatever the edges mention. |
 
-**Shape of the Earth is NOT part of the deliverable.** It is only Nilesh's example for the `.sci` language (used above to explain the ideas). Do not plan or build a Lean version of it. `Empirica/ShapeOfEarth.lean` is an empty placeholder (`-- To Do`) and not imported anywhere; ignore it.
+**Shape of the Earth is NOT one of our 10 domain episodes.** It is Nilesh's example (the `.sci` language and now `Scilib/ShapeOfEarth.lean`, which he has filled in on `main`). Do not plan or build another version of it; it is the reference for what a worked graph looks like.
 
 ### Design choices for the Lean version
 
@@ -297,6 +362,6 @@ There is no `contradicts` edge. Instead, `Theory.absurd` (`⊥`) is a special no
 
 ### 10-domain showcase plan
 
-Goal: 10 self-contained domain files, each an `Empirica.Graph` value with real nodes and `#eval` queries demonstrating the ontology's expressiveness. Together they form the hackathon deliverable.
+Goal: 10 self-contained domain files, each a `Scilib.Graph` value with real nodes and `#eval` queries demonstrating the ontology's expressiveness. Together they form the hackathon deliverable.
 
-**Domains: see `TAXONOMY.md` (DRAFT v1, 2026-10-17).** An earlier list of guessed domains was removed because it was not researched. The new list is 10 reasoning situations (fit vs test, crucial test, blame, hidden assumption, replication conflict, search effects, exploratory discovery, causal intervention, extrapolation, resolving power), each with one ILLUSTRATIVE episode: Mercury perihelion, Meselson-Stahl, OPERA neutrinos, mesosomes, cold fusion, 750 GeV excess, Penzias-Wilson, Semmelweis, TGN1412, Kaufmann-Bucherer. **Only the 10 categories are decided; the examples are NOT decided.** The episodes only show what each category looks like. Parth plans to broaden the examples later by classifying more episodes into the categories (e.g. only 1 chemistry episode exists for now; more will be added). Do not treat any episode as the final pick. The taxonomy is Claude's synthesis from research and is NOT an agreed standard; Parth accepted the categories as "good enough" as the working list (2026-10-17), but they can still change. Numbers in it must be checked against primary papers before use. Shape of the Earth is out because it is Nilesh's example.
+**Domains: see `TAXONOMY.md` (DRAFT v3, 2026-10-18).** An earlier list of guessed domains was removed because it was not researched. The list is 10 reasoning situations (fit vs test, crucial test, blame, hidden assumption, replication conflict, search effects, exploratory discovery, causal intervention, extrapolation, resolving power), each with 3 candidate episodes (30 in all) chosen to translate into an Earth-style graph like `earth.png`. Materials-informatics episodes sit in #1 (DFT functionals), #6 (GNoME), #9 (ML superconductor Tc) and #10 (ML formation energy vs stability). **The 10 categories are decided; the 30 episodes are candidates until each one passes the source check against primary papers.** Episodes marked "thin" in `TAXONOMY.md` have too few rivals, and GNoME is partly contested. Do not treat any episode as the final pick. The taxonomy is Claude's synthesis from research and is NOT an agreed standard; Parth accepted the categories as "good enough" as the working list (2026-10-17), but they can still change. Numbers in it must be checked against primary papers before use. Shape of the Earth is out because it is Nilesh's example.
