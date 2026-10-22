@@ -5,3 +5,11 @@ import Scilib.ShapeOfEarth
 import Scilib.Semiconductor
 import Scilib.Heliocentrism
 import Scilib.HeatCapacityOfSolids
+import Scilib.Rainbow
+import Scilib.SoapFilm
+import Scilib.Magnus
+import Scilib.Superconductivity
+import Scilib.Bernoulli
+import Scilib.Leidenfrost
+import Scilib.Diffraction
+import Scilib.Bragg
