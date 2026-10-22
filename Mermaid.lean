@@ -2,6 +2,7 @@ import Scilib.ShapeOfEarth
 import Scilib.Heliocentrism
 import Scilib.Semiconductor
 import Scilib.HeatCapacityOfSolids
+import Scilib.SoapFilm
 
 open Scilib
 
@@ -99,6 +100,8 @@ def generateDiagrams : IO Unit := do
     (toMarkdown "Semiconductor" Scilib.Semiconductor.evidenceGraph)
   IO.FS.writeFile "viz/heat-capacity.md"
     (toMarkdown "Heat capacity of solids" Scilib.HeatCapacity.evidenceGraph)
+  IO.FS.writeFile "viz/soap-film.md"
+    (toMarkdown "Colours in soap films" Scilib.SoapFilm.evidenceGraph)
 
 end Mermaid
 
